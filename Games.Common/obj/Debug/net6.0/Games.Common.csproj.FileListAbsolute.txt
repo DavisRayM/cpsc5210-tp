@@ -1,0 +1,12 @@
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\bin\Debug\net6.0\Games.Common.deps.json
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\bin\Debug\net6.0\Games.Common.dll
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\bin\Debug\net6.0\Games.Common.pdb
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\Games.Common.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\Games.Common.AssemblyInfoInputs.cache
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\Games.Common.AssemblyInfo.cs
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\Games.Common.csproj.CoreCompileInputs.cache
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\Games.Common.sourcelink.json
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\Games.Common.dll
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\refint\Games.Common.dll
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\Games.Common.pdb
+C:\Users\davis\OneDrive\Documents\cpsc5210-tp\Games.Common\obj\Debug\net6.0\ref\Games.Common.dll
