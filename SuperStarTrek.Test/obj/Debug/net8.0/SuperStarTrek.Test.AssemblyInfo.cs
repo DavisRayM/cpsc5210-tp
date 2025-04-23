@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SuperStarTrek.Test")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dfe1c757c3d4dad290b595c51e21b2eb7cedcfcc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c620ecd0d80f383da87faff34c4617426d25bfb5")]
 [assembly: System.Reflection.AssemblyProductAttribute("SuperStarTrek.Test")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SuperStarTrek.Test")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
