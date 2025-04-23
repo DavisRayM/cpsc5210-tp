@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SuperStartTrek.Space;
+namespace SuperStarTrek.Space;
 
 public class CourseTests
 {
