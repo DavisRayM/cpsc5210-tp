@@ -42,18 +42,18 @@ internal class Galaxy
         }
     }
 
-    internal virtual QuadrantInfo this[Coordinates coordinate] => _quadrants[coordinate.X][coordinate.Y];
+    internal QuadrantInfo this[Coordinates coordinate] => _quadrants[coordinate.X][coordinate.Y];
 
-    internal virtual int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
+    internal int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
 
-    internal virtual int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
+    internal int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
 
     internal IEnumerable<IEnumerable<QuadrantInfo>> Quadrants => _quadrants;
 
     private static string GetQuadrantName(Coordinates coordinates) =>
         $"{_regionNames[coordinates.RegionIndex]} {_subRegionIdentifiers[coordinates.SubRegionIndex]}";
 
-    internal virtual IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(Quadrant quadrant) =>
+    internal IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(Quadrant quadrant) =>
         Enumerable.Range(-1, 3)
             .Select(dx => dx + quadrant.Coordinates.X)
             .Select(x => GetNeighborhoodRow(quadrant, x));
