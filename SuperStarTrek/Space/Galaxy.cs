@@ -7,7 +7,7 @@ using static System.StringSplitOptions;
 
 namespace SuperStarTrek.Space;
 
-internal class Galaxy
+internal class Galaxy 
 {
     private static readonly string[] _regionNames;
     private static readonly string[] _subRegionIdentifiers;
@@ -42,18 +42,18 @@ internal class Galaxy
         }
     }
 
-    internal QuadrantInfo this[Coordinates coordinate] => _quadrants[coordinate.X][coordinate.Y];
+    internal virtual QuadrantInfo this[Coordinates coordinate] => _quadrants[coordinate.X][coordinate.Y];
 
-    internal int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
+    internal virtual int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
 
-    internal int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
+    internal virtual int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
 
     internal IEnumerable<IEnumerable<QuadrantInfo>> Quadrants => _quadrants;
 
     private static string GetQuadrantName(Coordinates coordinates) =>
         $"{_regionNames[coordinates.RegionIndex]} {_subRegionIdentifiers[coordinates.SubRegionIndex]}";
 
-    internal IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(Quadrant quadrant) =>
+    internal virtual IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(Quadrant quadrant) =>
         Enumerable.Range(-1, 3)
             .Select(dx => dx + quadrant.Coordinates.X)
             .Select(x => GetNeighborhoodRow(quadrant, x));
