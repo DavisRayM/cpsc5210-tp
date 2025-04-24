@@ -20,36 +20,37 @@ namespace SuperStarTrek.Test.Space
         }
 
         [Test]
-        public void Valid_Direction_Low_In_Course_Constructor_Should_Correctly_Set_DeltaX_And_DeltaY()
+        [TestCase(1, 0, 1)]
+        [TestCase(5.5f, 0.5f, -1)]
+        [TestCase(9, 0, 1)]
+        public void Valid_Direction_In_Course_Constructor_Should_Correctly_Set_DeltaX_And_DeltaY(
+            float direction, float expectedDeltaX, float expectedDeltaY
+        )
         {
-            Course testCourse = new(1);
+            Course testCourse = new(direction);
             Assert.Multiple(() =>
             {
-                Assert.That(testCourse.DeltaX, Is.EqualTo(0));
-                Assert.That(testCourse.DeltaY, Is.EqualTo(1));
+                Assert.That(testCourse.DeltaX, Is.EqualTo(expectedDeltaX));
+                Assert.That(testCourse.DeltaY, Is.EqualTo(expectedDeltaY));
             });
         }
 
         [Test]
-        public void Valid_Direction_Nominal_In_Course_Constructor_Should_Correctly_Set_DeltaX_And_DeltaY()
+        [TestCase(1, 0, 0, ExpectedResult = new[] { "1 , 2", "1 , 3", "1 , 4", "1 , 5", "1 , 6", "1 , 7", "1 , 8" })]
+        [TestCase(5.5f, 0, 3, ExpectedResult = new[] { "2 , 3", "2 , 2", "3 , 1" })]
+        [TestCase(9, 0, 7, ExpectedResult = new string[0])]
+        [TestCase(9, 3, 3, ExpectedResult = new[] { "4 , 5", "4 , 6", "4 , 7", "4 , 8" })]
+        [TestCase(1, 3, 7, ExpectedResult = new string[0])]
+        [TestCase(5.5f, 3, 0, ExpectedResult = new string[0])]
+        [TestCase(5.5f, 7, 7, ExpectedResult = new string[0])]
+        [TestCase(9, 7, 0, ExpectedResult = new[] { "8 , 2", "8 , 3", "8 , 4", "8 , 5", "8 , 6", "8 , 7", "8 , 8" })]
+        [TestCase(1, 7, 3, ExpectedResult = new[] { "8 , 5", "8 , 6", "8 , 7", "8 , 8" })]
+        public string[] Valid_GetSectorFrom_Returns_Correct_Coordinates(float direction, int startX, int startY)
         {
-            Course testCourse = new(5.5f);
-            Assert.Multiple(() =>
-            {
-                Assert.That(testCourse.DeltaX, Is.EqualTo(0.5));
-                Assert.That(testCourse.DeltaY, Is.EqualTo(-1));
-            });
-        }
-
-        [Test]
-        public void Valid_Direction_High_In_Course_Constructor_Should_Correctly_Set_DeltaX_And_DeltaY()
-        {
-            Course testCourse = new(9);
-            Assert.Multiple(() =>
-            {
-                Assert.That(testCourse.DeltaX, Is.EqualTo(0));
-                Assert.That(testCourse.DeltaY, Is.EqualTo(1));
-            });
+            Course testCourse = new(direction);
+            return [.. testCourse
+                .GetSectorsFrom(new Coordinates(startX, startY))
+                .Select(c => c.ToString())];
         }
     }
 
