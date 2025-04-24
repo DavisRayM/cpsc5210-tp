@@ -77,14 +77,50 @@ namespace SuperStarTrek.Test.Space
             int expectedNewSector
         )
         {
-            (bool validQuadrant, int newQuadrant, int newSector) = Course.GetNewCoordinate(
-                quadrant, sector, sectorsTravelled
-            );
+            (
+                bool validQuadrant, int newQuadrant, int newSector
+            ) = Course.GetNewCoordinate(quadrant, sector, sectorsTravelled);
             Assert.Multiple(() =>
             {
                 Assert.That(validQuadrant, Is.EqualTo(expectedValidQuadrant));
                 Assert.That(newQuadrant, Is.EqualTo(expectedNewQuadrant));
                 Assert.That(newSector, Is.EqualTo(expectedNewSector));
+            });
+        }
+
+        [Test]
+        [TestCase(1, 4, 4, 4, 4, 0, true, "5 , 5", "5 , 5")]
+        [TestCase(1, 4, 4, 4, 4, 4, true, "5 , 6", "5 , 1")]
+        [TestCase(1, 4, 4, 4, 4, 5, true, "5 , 6", "5 , 2")]
+        [TestCase(1.5f, 4, 4, 4, 4, 8, true, "5 , 6", "1 , 5")]
+        [TestCase(9, 4, 4, 4, 4, 8, true, "5 , 6", "5 , 5")]
+        [TestCase(3, 4, 4, 4, 4, 40, false, "1 , 5", "1 , 5")]
+        [TestCase(4, 0, 0, 0, 0, 5, false, "1 , 1", "1 , 1")]
+        [TestCase(8, 7, 7, 7, 7, 3, false, "8 , 8", "8 , 8")]
+        public void GetDestination_Returns_Correct_Results(
+            float direction,
+            int quadrantX,
+            int quadrantY,
+            int sectorX,
+            int sectorY,
+            int distance,
+            bool expectedValidPosition,
+            string expectedQuadrant,
+            string expectedSector
+        )
+        {
+            Coordinates quadrant = new(quadrantX, quadrantY);
+            Coordinates sector = new(sectorX, sectorY);
+            
+            Course testCourse = new(direction);
+            (
+                bool validPosition, Coordinates quadrantResult, Coordinates sectorResult
+            ) = testCourse.GetDestination(quadrant, sector, distance);
+            Assert.Multiple(() =>
+            {
+                Assert.That(validPosition, Is.EqualTo(expectedValidPosition));
+                Assert.That(quadrantResult.ToString(), Is.EqualTo(expectedQuadrant));
+                Assert.That(sectorResult.ToString(), Is.EqualTo(expectedSector));
             });
         }
     }
