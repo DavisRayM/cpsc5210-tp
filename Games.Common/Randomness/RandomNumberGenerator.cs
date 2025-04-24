@@ -19,4 +19,6 @@ public class RandomNumberGenerator : IRandom
     public float PreviousFloat() => _previous;
 
     public void Reseed(int seed) => _random = new Random(seed);
+
+    public int Next(int minInclusive, int maxInclusive) => _random.Next(minInclusive, maxInclusive);
 }
