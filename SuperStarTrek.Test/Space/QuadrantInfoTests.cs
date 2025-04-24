@@ -10,6 +10,40 @@ namespace SuperStarTrek.Test.Space
         private Coordinates Coords = new Coordinates(0, 0);
 
         /**
+         * Test that `Create` sets the correct `Coordinates` depending on what's passed to it.
+         */
+        [Test]
+        public void Create_ExpectedCoordinates_FromInput()
+        {
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+
+            var expected = new Coordinates(4, 5);
+            var quadrantInfo = QuadrantInfo.Create(expected, Name, mockRandom.Object);
+            Assert.That(quadrantInfo.Coordinates, Is.EqualTo(expected));
+        }
+
+        /**
+         * Test that `Create` sets the correct `Name` depending on what's passed to it.
+         */
+        [Test]
+        public void Create_ExpectedName_FromInput()
+        {
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+
+            var expected = "Hey There!";
+            var quadrantInfo = QuadrantInfo.Create(Coords, expected, mockRandom.Object);
+            Assert.That(quadrantInfo.Name, Is.EqualTo(expected));
+        }
+
+        /**
          * Test that `Create` sets the correct `KlingonCount` for the floats returned
          */
         [TestCase(0.80f, ExpectedResult = 0)]
@@ -126,9 +160,9 @@ namespace SuperStarTrek.Test.Space
 
             var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
 
-            Assert.AreEqual("***", quadrantInfo.ToString());
+            Assert.That(quadrantInfo.ToString(), Is.EqualTo("***"));
             quadrantInfo.MarkAsKnown();
-            Assert.AreEqual("001", quadrantInfo.ToString());
+            Assert.That(quadrantInfo.ToString(), Is.EqualTo("001"));
         }
 
         /**
@@ -144,7 +178,7 @@ namespace SuperStarTrek.Test.Space
                 .Returns(0f);
 
             var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
-            Assert.AreEqual("001", quadrantInfo.Scan());
+            Assert.That(quadrantInfo.Scan(), Is.EqualTo("001"));
         }
 
         /**
@@ -205,7 +239,7 @@ namespace SuperStarTrek.Test.Space
 
             var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
 
-            Assert.AreEqual(quadrantInfo.KlingonCount, initial);
+            Assert.That(initial, Is.EqualTo(quadrantInfo.KlingonCount));
             quadrantInfo.RemoveKlingon();
 
             return quadrantInfo.KlingonCount;
