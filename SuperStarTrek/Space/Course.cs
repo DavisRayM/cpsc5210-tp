@@ -75,7 +75,7 @@ internal class Course
         return (xComplete && yComplete, new Coordinates(quadrantX, quadrantY), new Coordinates(sectorX, sectorY));
     }
 
-    private static (bool, int, int) GetNewCoordinate(int quadrant, int sector, float sectorsTravelled)
+    internal static (bool, int, int) GetNewCoordinate(int quadrant, int sector, float sectorsTravelled)
     {
         var galacticCoordinate = quadrant * 8 + sector + sectorsTravelled;
         var newQuadrant = (int)(galacticCoordinate / 8);
