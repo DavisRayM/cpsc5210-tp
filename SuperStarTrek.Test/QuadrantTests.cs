@@ -7,49 +7,57 @@ using Games.Common.IO;
 using Games.Common.Randomness;
 using System.Collections.Generic;
 
-namespace SuperStarTrek.Test.Space
+namespace SuperStarTrek.Space
 {
     [TestFixture]
     public class QuadrantTests
     {
-        private Mock<IReadWrite> _mockIO;
-        private Mock<IRandom> _mockRandom;
-        private Mock<Galaxy> _mockGalaxy;
-        private Mock<QuadrantInfo> _mockQuadrantInfo;
+        private Mock<IReadWrite> _ioMock;
+        private Mock<IRandom> _randomMock;
+        private Mock<Galaxy> _galaxyMock;
         private Enterprise _enterprise;
+        private QuadrantInfo _quadrantInfo;
+        private Quadrant _quadrant;
 
 
         [SetUp]
         public void Setup()
         {
-            // Setup mocks and test objects
-            _mockIO = new Mock<IReadWrite>();
-            _mockRandom = new Mock<IRandom>();
-            _mockGalaxy = new Mock<Galaxy>();
-            _mockQuadrantInfo = new Mock<QuadrantInfo>();
+            _randomMock = new Mock<IRandom>();
+            _ioMock = new Mock<IReadWrite>();
+            _galaxyMock = new Mock<Galaxy>(_randomMock.Object) {CallBase = true};
 
-            // Setup mock QuadrantInfo
-            _mockQuadrantInfo.Setup(q => q.Coordinates).Returns(new Coordinates(1, 1));
-            _mockQuadrantInfo.Setup(q => q.KlingonCount).Returns(2);
-            _mockQuadrantInfo.Setup(q => q.StarCount).Returns(3);
-            _mockQuadrantInfo.Setup(q => q.HasStarbase).Returns(true);
-            _mockQuadrantInfo.Setup(q => q.Name).Returns("Test Quadrant");
+            _quadrantInfo = QuadrantInfo.Create(new Coordinates(0, 0), "Test-Quadrant", _randomMock.Object);
 
-            // Setup enterprise with default position
-            _enterprise = new Enterprise(5000, sector: new Coordinates(0, 0), io: _mockRandom.Object, random: _mockIO.Object);
+            _enterprise = new Enterprise(5000, new Coordinates(1, 1), _ioMock.Object, _randomMock.Object);
+
+            _galaxyMock.Setup(g => g.GetNeighborhood(It.IsAny<Quadrant>()))
+                .Returns(new List<IEnumerable<QuadrantInfo>>());
+            _galaxyMock.Setup(g => g[It.IsAny<Coordinates>()]).Returns(_quadrantInfo);
+
+            // Sequence of random values:
+            // 1st: for KlingonCount = 2 (needs > 0.95 and ≤ 0.98)
+            // 2nd: for HasStarbase = true (needs > 0.96)
+            _randomMock.SetupSequence(r => r.NextFloat())
+                .Returns(0.96f)   // KlingonCount → 2
+                .Returns(0.97f);  // HasStarbase → true
+
+            _randomMock.Setup(r => r.Next(1,9)).Returns(5); // StarCount = 5
+           
+
+            
+                
+            _quadrant = new Quadrant(_quadrantInfo, _enterprise, _randomMock.Object, _galaxyMock.Object, _ioMock.Object);
+
+            
+
         }
 
         [Test]
-        public void Constructor_ShouldPositionObjectsCorrectly()
+        public void Quadrant_InitializesCorrectly_WithControlledRandomValues()
         {
-            var quadrant = new Quadrant(_mockQuadrantInfo.Object.
-                               _enterprise,
-                               _mockRandom.Object,
-                               _mockGalaxy.Object,
-                               _mockIO.Object);
-
-            Assert.That(quadrant.Coordinates, Is.EqualTo(new Coordinates(1, 1)));
-
+            Assert.AreEqual(2, _quadrant.KlingonCount);
+            Assert.IsTrue(_quadrant.HasStarbase);
         }
     }
 }
