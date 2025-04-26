@@ -2,13 +2,13 @@
 using SuperStarTrek.Objects;
 using Games.Common.IO;
 using Games.Common.Randomness;
+using NUnit.Framework;
 
 namespace SuperStarTrek.Space
 {
     [TestFixture]
     public class QuadrantTests
     {
-        private const string Name = "Test-Quadrant";
 
         [Test]
         public void Create_ExpectedCoordinates_CreateFactory()
@@ -20,7 +20,7 @@ namespace SuperStarTrek.Space
                 .Returns(0.0f);
 
             var expected = new Coordinates(1, 1);
-            var quadrantInfo = QuadrantInfo.Create(expected, Name, randomMock.Object);
+            var quadrantInfo = QuadrantInfo.Create(expected, "Test-Quadrant", randomMock.Object);
             Assert.That(quadrantInfo.Coordinates, Is.EqualTo(expected));
         }
 
@@ -67,17 +67,32 @@ namespace SuperStarTrek.Space
         }
 
         [Test]
-        public void TorpedoCollisonAt_WhenNoCollision_ReturnsDefaultResult()
+        public void TorpedoCollisonAt_WhenDefault_ReturnsFalse()
         {
             var randomMock = new Mock<IRandom>();
+            randomMock.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
             var ioMock = new Mock<IReadWrite>();
-            var enterpriseCoords = new Coordinates(2, 2);
-            var enterprise = new Enterprise(5000, enterpriseCoords, ioMock.Object, randomMock.Object);
+            
+            
             var galaxy = new Galaxy(randomMock.Object);
-            var quadrantInfo = QuadrantInfo.Create(new Coordinates(4, 4), "Test-Quadrant", randomMock.Object);
-            var quadrant = new Quadrant(quadrantInfo, enterprise, randomMock.Object, galaxy, ioMock.Object);
+            var quadrantInfo = QuadrantInfo.Create(new Coordinates(2, 2), "Test-Quadrant", randomMock.Object);
+            
 
-            var emptyCoords = new Coordinates(5, 5);
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+               .Returns(0.5f)
+               .Returns(0);
+
+            var enterprise = new Enterprise(5000, new Coordinates(1, 1), ioMock.Object, mockRandom.Object);
+
+            var quadrant = new Quadrant(quadrantInfo, enterprise, mockRandom.Object, galaxy, ioMock.Object);
+
+            //var notEmptyCoords = new Coordinates(4, 0);
+
+            var emptyCoords = new Coordinates(3, 3);
 
             bool result = quadrant.TorpedoCollisionAt(emptyCoords, out string message, out bool gameOver);
 
@@ -86,6 +101,8 @@ namespace SuperStarTrek.Space
             Assert.That(gameOver, Is.False);
 
         }
+        
+
 
         [Test]
         public void TorpedoCollisonAt_WhenHittingStar_ReturnsTrue()
@@ -96,7 +113,7 @@ namespace SuperStarTrek.Space
                 .Returns(0f)
                 .Returns(0f);
 
-            var quadrantInfo = QuadrantInfo.Create(new Coordinates(0, 0), Name, mockRandom.Object);
+            var quadrantInfo = QuadrantInfo.Create(new Coordinates(0, 0), "Test-Quadrant", mockRandom.Object);
             var mockRandomGalaxy = new Mock<IRandom>();
             mockRandom.SetupSequence(r => r.NextFloat())
                 .Returns(0f)
@@ -105,7 +122,7 @@ namespace SuperStarTrek.Space
             var galaxy = new Galaxy(mockRandomGalaxy.Object);
             var randomMock = new Mock<IRandom>();
             var ioMock = new Mock<IReadWrite>();
-            var enterprise = new Enterprise(0, new Coordinates(1, 0), ioMock.Object, randomMock.Object);
+            var enterprise = new Enterprise(0, new Coordinates(1, 1), ioMock.Object, randomMock.Object);
             randomMock.SetupSequence(r => r.NextFloat())
                 .Returns(0.5f)
                 .Returns(0);
@@ -119,5 +136,9 @@ namespace SuperStarTrek.Space
             Assert.That(message, Is.EqualTo($"Star at {coordinates} absorbed torpedo energy."));
             Assert.False(gameOver);
         }
+
+
+        
+
     }
 }
