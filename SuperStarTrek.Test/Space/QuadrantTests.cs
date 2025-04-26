@@ -1,8 +1,10 @@
 ﻿using Moq;
 using SuperStarTrek.Objects;
+using SuperStarTrek.Commands;
+using SuperStarTrek.Resources;
+using SuperStarTrek.Systems;
 using Games.Common.IO;
 using Games.Common.Randomness;
-using NUnit.Framework;
 
 namespace SuperStarTrek.Space
 {
@@ -75,11 +77,11 @@ namespace SuperStarTrek.Space
                 .Returns(0f)
                 .Returns(0f);
             var ioMock = new Mock<IReadWrite>();
-            
-            
+
+
             var galaxy = new Galaxy(randomMock.Object);
             var quadrantInfo = QuadrantInfo.Create(new Coordinates(2, 2), "Test-Quadrant", randomMock.Object);
-            
+
 
             var mockRandom = new Mock<IRandom>();
             mockRandom.SetupSequence(r => r.NextFloat())
@@ -101,7 +103,7 @@ namespace SuperStarTrek.Space
             Assert.That(gameOver, Is.False);
 
         }
-        
+
 
 
         [Test]
@@ -137,8 +139,50 @@ namespace SuperStarTrek.Space
             Assert.False(gameOver);
         }
 
+        /**
+         * Test that `Display` writes the correct strings to IO depending on the current state
+         * of the enterprise.
+         */
+        [TestCase(0, 0f, 1, 0, 0, Reason = "Prints only the Quadrant when Quadrant has no Klingon")] // 0 Klingons 
+        [TestCase(201, 0.81f, 1, 1, 0, Reason = "Prints the Combat Area text when a Klingon is in the sector and no Low shields message when shield is above 200")] // 1 Klingon with Shield at 201
+        [TestCase(200, 0.81f, 1, 1, 1, Reason = "Prints the Low Shields warning when shields are below or equal to 200")] // 1 Klingon with Shield at 200
+        [TestCase(0, 0.81f, 1, 1, 1, Reason = "Prints the Low Shields warning when shields are below or equal to 200")] // 1 Klingon with Shield at 200
+        public void Display_WhenCalled_WritesExpectedString(float shieldEnergy, float klingonCountRandom, int quadrantFormatCalledCount, int combatAreaFormatCalledCount, int lowShieldsFormatCalledCount)
+        {
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(klingonCountRandom)
+                .Returns(0f)
+                .Returns(0f);
 
-        
+            var quadrantInfo = QuadrantInfo.Create(new Coordinates(0, 0), "Test-Quadrant", mockRandom.Object);
+            var mockRandomGalaxy = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+            var galaxy = new Galaxy(mockRandomGalaxy.Object);
+            var randomMock = new Mock<IRandom>();
+            var ioMock = new Mock<IReadWrite>();
+            var enterprise = new Mock<Enterprise>(1, new Coordinates(1, 1), ioMock.Object, randomMock.Object);
+            var shieldControl = new ShieldControl(enterprise.Object, ioMock.Object);
+            shieldControl.ShieldEnergy = shieldEnergy;
 
+            enterprise.Object.Add(shieldControl);
+            randomMock.SetupSequence(r => r.NextFloat())
+                .Returns(0.5f)
+                .Returns(0);
+            var quadrant = new Quadrant(quadrantInfo, enterprise.Object, randomMock.Object, galaxy, ioMock.Object);
+            string textFormat = "{0}";
+            enterprise.Setup(e => e.Execute(Command.SRS))
+                .Returns(CommandResult.Ok);
+
+            quadrant.Display(textFormat);
+
+            enterprise.Verify(e => e.Execute(Command.SRS), Times.Exactly(1));
+            ioMock.Verify(io => io.Write(textFormat, quadrant), Times.Exactly(quadrantFormatCalledCount));
+            ioMock.Verify(io => io.Write(Strings.CombatArea), Times.Exactly(combatAreaFormatCalledCount));
+            ioMock.Verify(io => io.Write(Strings.LowShields), Times.Exactly(lowShieldsFormatCalledCount));
+        }
     }
 }
