@@ -12,6 +12,7 @@ namespace SuperStarTrek.Space
     public class QuadrantTests
     {
 
+        // Test: Create a QuadrantInfo with expected coordinates and check if factory method works correctly.
         [Test]
         public void Create_ExpectedCoordinates_CreateFactory()
         {
@@ -27,6 +28,7 @@ namespace SuperStarTrek.Space
         }
 
 
+        // Test: Create an Enterprise with a given initial energy and ensure the energy value is correctly set.
         [TestCase(5000)]
         [TestCase(-1)]
         [TestCase(0)]
@@ -37,6 +39,7 @@ namespace SuperStarTrek.Space
         }
 
 
+        // Test: Creating a Galaxy with mocked random should result in 1 Klingon being placed (based on random behavior).
         [Test]
         public void Create_Galaxy_WithSuppliedValues()
         {
@@ -52,6 +55,7 @@ namespace SuperStarTrek.Space
         }
 
 
+        // Test: Ensure the Quadrant constructor correctly sets the quadrant's coordinates.
         [Test]
         public void Constructor_ShouldPositionObjectsCorrectly()
         {
@@ -68,6 +72,7 @@ namespace SuperStarTrek.Space
             Assert.AreEqual(new Coordinates(1, 1), quadrant.Coordinates);
         }
 
+        // Test: TorpedoCollisionAt should return false when firing at an empty space (no objects at the coordinates).
         [Test]
         public void TorpedoCollisonAt_WhenDefault_ReturnsFalse()
         {
@@ -103,7 +108,7 @@ namespace SuperStarTrek.Space
         }
 
 
-
+        // Test: TorpedoCollisionAt should return true when a torpedo hits a star, and it should output the correct message.
         [Test]
         public void TorpedoCollisonAt_WhenHittingStar_ReturnsTrue()
         {
