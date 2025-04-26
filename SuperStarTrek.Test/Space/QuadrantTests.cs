@@ -90,8 +90,6 @@ namespace SuperStarTrek.Space
 
             var quadrant = new Quadrant(quadrantInfo, enterprise, mockRandom.Object, galaxy, ioMock.Object);
 
-            //var notEmptyCoords = new Coordinates(4, 0);
-
             var emptyCoords = new Coordinates(3, 3);
 
             bool result = quadrant.TorpedoCollisionAt(emptyCoords, out string message, out bool gameOver);
@@ -138,7 +136,6 @@ namespace SuperStarTrek.Space
         }
 
 
-        
 
     }
 }
