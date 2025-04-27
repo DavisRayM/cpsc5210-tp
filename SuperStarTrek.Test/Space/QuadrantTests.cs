@@ -13,7 +13,7 @@ namespace SuperStarTrek.Space
     {
 
         // Test: Create a QuadrantInfo with expected coordinates and check if factory method works correctly.
-        [Test]
+        [Test] //test
         public void Create_ExpectedCoordinates_CreateFactory()
         {
             var randomMock = new Mock<IRandom>();
