@@ -188,5 +188,78 @@ namespace SuperStarTrek.Space
             ioMock.Verify(io => io.Write(Strings.CombatArea), Times.Exactly(combatAreaFormatCalledCount));
             ioMock.Verify(io => io.Write(Strings.LowShields), Times.Exactly(lowShieldsFormatCalledCount));
         }
+        [Test]
+                   public void QuadrantHasStarbaseAtConstruction()
+                   {
+                       QuadrantInfo q = new QuadrantInfo(new Coordinates(5, 7), "test quadrant", 0, 0, true);
+                       var mockRandom = new Mock<IRandom>();
+                       var mockIo = new Mock<IReadWrite>();
+                       Enterprise e = new Enterprise(1000, new Coordinates(5, 5), mockIo.Object, mockRandom.Object);
+                       Galaxy g = new Galaxy(mockRandom.Object);
+
+                       Quadrant _quadrant = new Quadrant(q, e, mockRandom.Object, g, mockIo.Object);
+                       Assert.AreEqual(_quadrant.HasStarbase, true);
+                   }
+        [Test]
+                   public void QuadrantHasNoStarBaseAtConstruction()
+                   {
+                       QuadrantInfo q = new QuadrantInfo(new Coordinates(5, 7), "test quadrant", 0, 0, false);
+                       var mockRandom = new Mock<IRandom>();
+                       var mockIo = new Mock<IReadWrite>();
+                       Enterprise e = new Enterprise(1000, new Coordinates(5, 5), mockIo.Object, mockRandom.Object);
+                       Galaxy g = new Galaxy(mockRandom.Object);
+
+                       Quadrant _quadrant = new Quadrant(q, e, mockRandom.Object, g, mockIo.Object);
+                       Assert.AreEqual(_quadrant.HasStarbase, false);
+                   }
+        [Test]
+                 public void QuadrantEnterpriseNotNextToStarbaseAtConstruction()
+                 {
+                       QuadrantInfo q = new QuadrantInfo(new Coordinates(5, 7), "test quadrant", 0, 0, true);
+                       var mockRandom = new Mock<IRandom>();
+                       var mockIo = new Mock<IReadWrite>();
+                       Enterprise e = new Enterprise(1000, new Coordinates(5, 5), mockIo.Object, mockRandom.Object);
+                       Galaxy g = new Galaxy(mockRandom.Object);
+
+                       Quadrant _quadrant = new Quadrant(q, e, mockRandom.Object, g, mockIo.Object);
+                       Assert.AreEqual(_quadrant.EnterpriseIsNextToStarbase, false);
+                 }
+        [Test]
+                  public void QuadrantHasCorrectGalaxy()
+                  {
+                       QuadrantInfo q = new QuadrantInfo(new Coordinates(5, 7), "test quadrant", 0, 0, true);
+                       var mockRandom = new Mock<IRandom>();
+                       var mockIo = new Mock<IReadWrite>();
+                       Enterprise e = new Enterprise(1000, new Coordinates(5, 5), mockIo.Object, mockRandom.Object);
+                       Galaxy g = new Galaxy(mockRandom.Object);
+
+                       Quadrant _quadrant = new Quadrant(q, e, mockRandom.Object, g, mockIo.Object);
+                       Assert.AreEqual(_quadrant.Galaxy, g);
+                  }
+        [Test]
+                  public void QuadrantHasKlingonsAtConstruction()
+                  {
+                      QuadrantInfo q = new QuadrantInfo(new Coordinates(5, 7), "test quadrant", 1, 0, false);
+                      var mockRandom = new Mock<IRandom>();
+                      var mockIo = new Mock<IReadWrite>();
+                      Enterprise e = new Enterprise(1000, new Coordinates(5, 5), mockIo.Object, mockRandom.Object);
+                      Galaxy g = new Galaxy(mockRandom.Object);
+
+                      Quadrant _quadrant = new Quadrant(q, e, mockRandom.Object, g, mockIo.Object);
+                      Assert.AreEqual(_quadrant.HasKlingons, true);
+                  }
+        [Test]
+                  public void QuadrantHasNoKlingonsAtConstruction()
+                  {
+                      QuadrantInfo q = new QuadrantInfo(new Coordinates(5, 7), "test quadrant", 0, 0, false);
+                      var mockRandom = new Mock<IRandom>();
+                      var mockIo = new Mock<IReadWrite>();
+                      Enterprise e = new Enterprise(1000, new Coordinates(5, 5), mockIo.Object, mockRandom.Object);
+                      Galaxy g = new Galaxy(mockRandom.Object);
+
+                      Quadrant _quadrant = new Quadrant(q, e, mockRandom.Object, g, mockIo.Object);
+                      Assert.AreEqual(_quadrant.HasKlingons, false);
+                  }
+
     }
 }
