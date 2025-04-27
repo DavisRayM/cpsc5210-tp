@@ -79,7 +79,7 @@ internal class Enterprise
             false => "Green"
         };
 
-    internal CommandResult Execute(Command command)
+    internal virtual CommandResult Execute(Command command)
     {
         if (command == Command.XXX) { return CommandResult.GameOver; }
 

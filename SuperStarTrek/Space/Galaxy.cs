@@ -7,7 +7,7 @@ using static System.StringSplitOptions;
 
 namespace SuperStarTrek.Space;
 
-internal class Galaxy
+internal class Galaxy 
 {
     private static readonly string[] _regionNames;
     private static readonly string[] _subRegionIdentifiers;

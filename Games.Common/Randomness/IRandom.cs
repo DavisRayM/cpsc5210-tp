@@ -22,4 +22,6 @@ public interface IRandom
     /// </summary>
     /// <param name="seed">The seed.</param>
     void Reseed(int seed);
+
+    int Next(int minInclusive, int maxExclusive);
 }
