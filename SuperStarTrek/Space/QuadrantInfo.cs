@@ -6,7 +6,7 @@ internal class QuadrantInfo
 {
     private bool _isKnown;
 
-    private QuadrantInfo(Coordinates coordinates, string name, int klingonCount, int starCount, bool hasStarbase)
+    internal QuadrantInfo(Coordinates coordinates, string name, int klingonCount, int starCount, bool hasStarbase)
     {
         Coordinates = coordinates;
         Name = name;
