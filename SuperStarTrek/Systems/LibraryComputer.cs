@@ -29,7 +29,7 @@ internal class LibraryComputer : Subsystem
         return CommandResult.Ok;
     }
 
-    private int GetFunctionIndex()
+    internal int GetFunctionIndex()
     {
         while (true)
         {
