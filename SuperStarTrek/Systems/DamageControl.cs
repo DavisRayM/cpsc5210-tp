@@ -17,7 +17,7 @@ internal class DamageControl : Subsystem
         _io = io;
     }
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
     {
         if (IsDamaged)
         {

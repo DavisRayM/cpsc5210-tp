@@ -19,7 +19,7 @@ internal class LongRangeSensors : Subsystem
 
     protected override bool CanExecuteCommand() => IsOperational("{name} are inoperable");
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
     {
         _io.WriteLine($"Long range scan for quadrant {quadrant.Coordinates}");
         _io.WriteLine("-------------------");

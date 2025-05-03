@@ -19,7 +19,7 @@ internal class LibraryComputer : Subsystem
 
     protected override bool CanExecuteCommand() => IsOperational("Computer disabled");
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
     {
         var index = GetFunctionIndex();
         _io.WriteLine();

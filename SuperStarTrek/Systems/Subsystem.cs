@@ -40,7 +40,7 @@ internal abstract class Subsystem
     internal CommandResult ExecuteCommand(Quadrant quadrant)
         => CanExecuteCommand() ? ExecuteCommandCore(quadrant) : CommandResult.Ok;
 
-    protected abstract CommandResult ExecuteCommandCore(Quadrant quadrant);
+    internal abstract CommandResult ExecuteCommandCore(Quadrant quadrant);
 
     internal virtual void Repair()
     {

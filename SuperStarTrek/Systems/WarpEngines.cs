@@ -19,7 +19,7 @@ namespace SuperStarTrek.Systems
             _io = io;
         }
 
-        protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+        internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
         {
             if (_io.TryReadCourse("Course", "   Lt. Sulu", out var course) &&
                 TryGetWarpFactor(out var warpFactor) &&

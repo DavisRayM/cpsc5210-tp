@@ -26,7 +26,7 @@ internal class ShortRangeSensors : Subsystem
         _io = io;
     }
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
     {
         if (_enterprise.IsDocked)
         {

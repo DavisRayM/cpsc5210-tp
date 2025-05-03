@@ -24,7 +24,7 @@ internal class PhaserControl : Subsystem
 
     protected override bool CanExecuteCommand() => IsOperational("Phasers inoperative");
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
     {
         if (!quadrant.HasKlingons)
         {
