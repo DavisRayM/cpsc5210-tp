@@ -16,7 +16,7 @@ internal class DirectionDistanceCalculator : NavigationCalculator
         _io = io;
     }
 
-    internal override void Execute(Quadrant quadrant)
+    internal override void Execute(IQuadrant quadrant)
     {
         IO.WriteLine("Direction/distance calculator:");
         IO.Write($"You are at quadrant {_enterprise.QuadrantCoordinates}");

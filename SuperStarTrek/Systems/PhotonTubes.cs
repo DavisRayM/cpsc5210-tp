@@ -31,7 +31,7 @@ internal class PhotonTubes : Subsystem
         return false;
     }
 
-    internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {
         if (!_io.TryReadCourse("Photon torpedo course", "Ensign Chekov", out var course))
         {

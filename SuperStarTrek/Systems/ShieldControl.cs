@@ -22,7 +22,7 @@ internal class ShieldControl : Subsystem
 
     protected override bool CanExecuteCommand() => IsOperational("{name} inoperable");
 
-    internal override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {
         _io.WriteLine($"Energy available = {_enterprise.TotalEnergy}");
         var requested = _io.ReadNumber($"Number of units to shields");

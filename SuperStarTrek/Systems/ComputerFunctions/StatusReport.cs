@@ -19,7 +19,7 @@ internal class StatusReport : ComputerFunction
         _enterprise = enterprise;
     }
 
-    internal override void Execute(Quadrant quadrant)
+    internal override void Execute(IQuadrant quadrant)
     {
         IO.WriteLine("   Status report:");
         IO.Write("Klingon".Pluralize(_galaxy.KlingonCount));

@@ -9,7 +9,7 @@ using SuperStarTrek.Resources;
 
 namespace SuperStarTrek.Space;
 
-internal class Quadrant
+internal class Quadrant: IQuadrant
 {
     private readonly QuadrantInfo _info;
     private readonly IRandom _random;
@@ -40,15 +40,15 @@ internal class Quadrant
         PositionObject(_ => new Star(), _info.StarCount);
     }
 
-    internal Coordinates Coordinates => _info.Coordinates;
+    public Coordinates Coordinates => _info.Coordinates;
 
-    internal bool HasKlingons => _info.KlingonCount > 0;
+    public bool HasKlingons => _info.KlingonCount > 0;
 
-    internal int KlingonCount => _info.KlingonCount;
+    public int KlingonCount => _info.KlingonCount;
 
-    internal bool HasStarbase => _info.HasStarbase;
+    public bool HasStarbase => _info.HasStarbase;
 
-    internal Starbase Starbase { get; }
+    public Starbase Starbase { get; }
 
     internal Galaxy Galaxy { get; }
 
@@ -57,7 +57,7 @@ internal class Quadrant
         Math.Abs(_enterprise.SectorCoordinates.X - Starbase.Sector.X) <= 1 &&
         Math.Abs(_enterprise.SectorCoordinates.Y - Starbase.Sector.Y) <= 1;
 
-    internal IEnumerable<Klingon> Klingons => _sectors.Values.OfType<Klingon>();
+    public IEnumerable<Klingon> Klingons => _sectors.Values.OfType<Klingon>();
 
     public override string ToString() => _info.Name;
 
@@ -95,7 +95,7 @@ internal class Quadrant
 
     internal bool HasObjectAt(Coordinates coordinates) => _sectors.ContainsKey(coordinates);
 
-    internal bool TorpedoCollisionAt(Coordinates coordinates, out string message, out bool gameOver)
+    public bool TorpedoCollisionAt(Coordinates coordinates, out string message, out bool gameOver)
     {
         gameOver = false;
         message = default;
@@ -124,14 +124,14 @@ internal class Quadrant
         }
     }
 
-    internal string Remove(Klingon klingon)
+    public string Remove(Klingon klingon)
     {
         _sectors.Remove(klingon.Sector);
         _info.RemoveKlingon();
         return "*** Klingon destroyed ***";
     }
 
-    internal CommandResult KlingonsMoveAndFire()
+    public CommandResult KlingonsMoveAndFire()
     {
         foreach (var klingon in Klingons.ToList())
         {
@@ -144,7 +144,7 @@ internal class Quadrant
         return KlingonsFireOnEnterprise();
     }
 
-    internal CommandResult KlingonsFireOnEnterprise()
+    public CommandResult KlingonsFireOnEnterprise()
     {
         if (EnterpriseIsNextToStarbase && Klingons.Any())
         {
@@ -173,7 +173,7 @@ internal class Quadrant
         }
     }
 
-    internal IEnumerable<string> GetDisplayLines() => Enumerable.Range(0, 8).Select(x => GetDisplayLine(x));
+    public IEnumerable<string> GetDisplayLines() => Enumerable.Range(0, 8).Select(x => GetDisplayLine(x));
 
     private string GetDisplayLine(int x) =>
         string.Join(
