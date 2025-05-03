@@ -17,7 +17,7 @@ internal class LongRangeSensors : Subsystem
         _io = io;
     }
 
-    protected override bool CanExecuteCommand() => IsOperational("{name} are inoperable");
+    internal override bool CanExecuteCommand() => IsOperational("{name} are inoperable");
 
     internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {

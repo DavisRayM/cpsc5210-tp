@@ -24,7 +24,7 @@ internal abstract class Subsystem
 
     internal Command Command { get; }
 
-    protected virtual bool CanExecuteCommand() => true;
+    internal virtual bool CanExecuteCommand() => true;
 
     protected bool IsOperational(string notOperationalMessage)
     {

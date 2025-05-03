@@ -22,7 +22,7 @@ internal class PhaserControl : Subsystem
         _random = random;
     }
 
-    protected override bool CanExecuteCommand() => IsOperational("Phasers inoperative");
+    internal override bool CanExecuteCommand() => IsOperational("Phasers inoperative");
 
     internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {

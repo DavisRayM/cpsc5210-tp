@@ -20,7 +20,7 @@ internal class ShieldControl : Subsystem
 
     internal float ShieldEnergy { get; set; }
 
-    protected override bool CanExecuteCommand() => IsOperational("{name} inoperable");
+    internal override bool CanExecuteCommand() => IsOperational("{name} inoperable");
 
     internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {

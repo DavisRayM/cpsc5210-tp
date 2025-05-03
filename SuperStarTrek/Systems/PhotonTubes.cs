@@ -21,7 +21,7 @@ internal class PhotonTubes : Subsystem
 
     internal int TorpedoCount { get; private set; }
 
-    protected override bool CanExecuteCommand() => HasTorpedoes() && IsOperational("{name} are not operational");
+    internal override bool CanExecuteCommand() => HasTorpedoes() && IsOperational("{name} are not operational");
 
     private bool HasTorpedoes()
     {

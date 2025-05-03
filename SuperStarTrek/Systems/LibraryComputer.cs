@@ -17,7 +17,7 @@ internal class LibraryComputer : Subsystem
         _functions = functions;
     }
 
-    protected override bool CanExecuteCommand() => IsOperational("Computer disabled");
+    internal override bool CanExecuteCommand() => IsOperational("Computer disabled");
 
     internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {
