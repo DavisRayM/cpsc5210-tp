@@ -21,7 +21,7 @@ internal class Starbase
 
     public override string ToString() => ">!<";
 
-    internal bool TryRepair(Enterprise enterprise, out float repairTime)
+    internal virtual bool TryRepair(Enterprise enterprise, out float repairTime)
     {
         repairTime = enterprise.DamagedSystemCount * 0.1f + _repairDelay;
         if (repairTime >= 1) { repairTime = 0.9f; }
