@@ -24,7 +24,7 @@ internal abstract class Subsystem
 
     internal Command Command { get; }
 
-    protected virtual bool CanExecuteCommand() => true;
+    internal virtual bool CanExecuteCommand() => true;
 
     protected bool IsOperational(string notOperationalMessage)
     {
@@ -40,7 +40,7 @@ internal abstract class Subsystem
     internal CommandResult ExecuteCommand(Quadrant quadrant)
         => CanExecuteCommand() ? ExecuteCommandCore(quadrant) : CommandResult.Ok;
 
-    protected abstract CommandResult ExecuteCommandCore(Quadrant quadrant);
+    internal abstract CommandResult ExecuteCommandCore(IQuadrant quadrant);
 
     internal virtual void Repair()
     {

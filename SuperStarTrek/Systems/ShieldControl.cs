@@ -20,9 +20,9 @@ internal class ShieldControl : Subsystem
 
     internal float ShieldEnergy { get; set; }
 
-    protected override bool CanExecuteCommand() => IsOperational("{name} inoperable");
+    internal override bool CanExecuteCommand() => IsOperational("{name} inoperable");
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {
         _io.WriteLine($"Energy available = {_enterprise.TotalEnergy}");
         var requested = _io.ReadNumber($"Number of units to shields");
