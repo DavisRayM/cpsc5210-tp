@@ -9,7 +9,7 @@ using SuperStarTrek.Resources;
 
 namespace SuperStarTrek.Space;
 
-internal class Quadrant: IQuadrant
+internal class Quadrant : IQuadrant
 {
     private readonly QuadrantInfo _info;
     private readonly IRandom _random;

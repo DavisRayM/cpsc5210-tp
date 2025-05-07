@@ -46,13 +46,13 @@ internal class Enterprise
 
     internal float TotalEnergy { get; private set; }
 
-    internal int DamagedSystemCount => _systems.Count(s => s.IsDamaged);
+    internal virtual int DamagedSystemCount => _systems.Count(s => s.IsDamaged);
 
     internal IEnumerable<Subsystem> Systems => _systems;
 
     internal PhotonTubes PhotonTubes => (PhotonTubes)_commandExecutors[Command.TOR];
 
-    internal bool IsDocked => _quadrant.EnterpriseIsNextToStarbase;
+    internal virtual bool IsDocked => _quadrant.EnterpriseIsNextToStarbase;
 
     internal bool IsStranded => TotalEnergy < 10 || Energy < 10 && ShieldControl.IsDamaged;
 
