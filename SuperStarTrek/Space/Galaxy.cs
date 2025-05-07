@@ -44,9 +44,9 @@ internal class Galaxy
 
     internal QuadrantInfo this[Coordinates coordinate] => _quadrants[coordinate.X][coordinate.Y];
 
-    internal int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
+    internal virtual int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
 
-    internal int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
+    internal virtual int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
 
     internal IEnumerable<IEnumerable<QuadrantInfo>> Quadrants => _quadrants;
 
