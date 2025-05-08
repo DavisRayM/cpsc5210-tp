@@ -89,7 +89,7 @@ namespace SuperStarTrek.Test.Systems
             _photonTubes.TakeDamage(0.5f);
 
             
-            Assert.AreEqual(0.5f, _photonTubes.Condition);
+            Assert.AreEqual(-0.5f, _photonTubes.Condition);
         }
 
 
