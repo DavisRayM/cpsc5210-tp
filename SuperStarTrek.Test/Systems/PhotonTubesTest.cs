@@ -54,6 +54,20 @@ namespace SuperStarTrek.Test.Systems
             Assert.IsTrue(result);
         }
 
+        [Test]
+        public void CanExecuteCommand_WhenDamaged_ReturnsFalse()
+        {
+            
+            _photonTubes.TakeDamage(1.0f); 
+
+            
+            bool result = _photonTubes.CanExecuteCommand();
+
+            
+            Assert.IsFalse(result);
+            _mockIO.Verify(io => io.WriteLine("Photon Tubes are not operational"), Times.Once);
+        }
+
 
     }
 }
