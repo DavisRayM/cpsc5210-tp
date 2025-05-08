@@ -6,6 +6,7 @@ using SuperStarTrek.Objects;
 using SuperStarTrek.Space;
 using SuperStarTrek.Commands;
 using NUnit.Framework;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 namespace SuperStarTrek.Test.Systems
 {
@@ -66,6 +67,19 @@ namespace SuperStarTrek.Test.Systems
             
             Assert.IsFalse(result);
             _mockIO.Verify(io => io.WriteLine("Photon Tubes are not operational"), Times.Once);
+        }
+
+        [Test]
+        public void Repair_FixesSystem()
+        {
+            // Arrange
+            _photonTubes.TakeDamage(0.5f);
+
+            // Act
+            _photonTubes.Repair();
+
+            // Assert
+            Assert.AreEqual(0.0f, _photonTubes.Condition);
         }
 
 
