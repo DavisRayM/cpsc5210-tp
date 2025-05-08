@@ -72,14 +72,24 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Repair_FixesSystem()
         {
-            // Arrange
+            
             _photonTubes.TakeDamage(0.5f);
 
-            // Act
+            
             _photonTubes.Repair();
 
-            // Assert
+            
             Assert.AreEqual(0.0f, _photonTubes.Condition);
+        }
+
+        [Test]
+        public void TakeDamage_DamagesSystem()
+        {
+            
+            _photonTubes.TakeDamage(0.5f);
+
+            
+            Assert.AreEqual(0.5f, _photonTubes.Condition);
         }
 
 
