@@ -11,7 +11,7 @@ namespace SuperStarTrek;
 
 internal class Game
 {
-    private readonly TextIO _io;
+    private readonly IReadWrite _io;
     private readonly IRandom _random;
 
     private int _initialStardate;
@@ -22,7 +22,7 @@ internal class Game
     private int _initialKlingonCount;
     private Enterprise _enterprise;
 
-    internal Game(TextIO io, IRandom random)
+    internal Game(IReadWrite io, IRandom random)
     {
         _io = io;
         _random = random;
@@ -30,7 +30,7 @@ internal class Game
 
     internal float Stardate => _currentStardate;
 
-    internal float StardatesRemaining => _finalStarDate - _currentStardate;
+    internal virtual float StardatesRemaining => _finalStarDate - _currentStardate;
 
     internal void DoIntroduction()
     {
