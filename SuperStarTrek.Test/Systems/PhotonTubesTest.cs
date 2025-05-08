@@ -44,6 +44,15 @@ namespace SuperStarTrek.Test.Systems
         }
 
 
+        [Test]
+        public void CanExecuteCommand_WithTorpedoesAndOperational_ReturnsTrue()
+        {
+            // PhotonTubes is operational by default (Condition = 0)
+
+            bool result = _photonTubes.CanExecuteCommand();
+
+            Assert.IsTrue(result);
+        }
 
 
     }
