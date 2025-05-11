@@ -53,7 +53,7 @@ internal class Galaxy
     private static string GetQuadrantName(Coordinates coordinates) =>
         $"{_regionNames[coordinates.RegionIndex]} {_subRegionIdentifiers[coordinates.SubRegionIndex]}";
 
-    internal IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(IQuadrant quadrant) =>
+    internal virtual IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(IQuadrant quadrant) =>
         Enumerable.Range(-1, 3)
             .Select(dx => dx + quadrant.Coordinates.X)
             .Select(x => GetNeighborhoodRow(quadrant, x));
