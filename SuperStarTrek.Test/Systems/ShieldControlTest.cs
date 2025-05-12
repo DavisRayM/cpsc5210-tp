@@ -22,6 +22,18 @@ namespace SuperStarTrek.Test.Systems
             Assert.IsTrue(shieldControl.CanExecuteCommand());
         }
 
+        [Test]
+        public void CanExecuteCommand_WhenDamaged_ReturnsFalse()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
+            shieldControl.TakeDamage(1);
+            Assert.IsFalse(shieldControl.CanExecuteCommand());
+            mockIO.Verify(io => io.WriteLine("Shield Control inoperable"), Times.Once);
+        }
 
     }
 }
