@@ -5,8 +5,7 @@ using SuperStarTrek.Systems;
 using SuperStarTrek.Objects;
 using SuperStarTrek.Space;
 using SuperStarTrek.Commands;
-using NUnit.Framework;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+
 
 namespace SuperStarTrek.Test.Systems
 {
@@ -91,6 +90,21 @@ namespace SuperStarTrek.Test.Systems
             
             Assert.AreEqual(-0.5f, _photonTubes.Condition);
         }
+
+        //[Test]
+        //public void ReplenishTorpedoes_ResetsToInitialTorpedoCount()
+        //{
+        //    // Arrange
+        //    // Use some torpedoes
+        //    _photonTubes.TorpedoCount = 3; // Simulate having used 7 torpedoes
+
+        //    // Act
+        //    _photonTubes.ReplenishTorpedoes();
+
+        //    // Assert
+        //    Assert.AreEqual(INITIAL_TORPEDO_COUNT, _photonTubes.TorpedoCount);
+        //    _mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.Never); // Verify no messages were output
+        //}
 
 
     }
