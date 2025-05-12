@@ -62,7 +62,23 @@ namespace SuperStarTrek.Test.Systems
             mockIO.Verify(io => io.WriteLine("Shield Control inoperable"), Times.Once);
         }
 
-        
+        [Test]
+        public void ExecuteCommandCore_DisplaysAvailableEnergy()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(1000, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+            var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
+
+            //mockEnterprise.Setup(e => e.TotalEnergy).Returns(1000);
+            mockIO.Setup(io => io.ReadNumber("Number of units to shields")).Returns(500);
+
+            shieldControl.ExecuteCommandCore(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine("Energy available = 1000"), Times.Once);
+        }
+
 
 
     }
