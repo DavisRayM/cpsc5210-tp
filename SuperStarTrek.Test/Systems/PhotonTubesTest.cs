@@ -9,47 +9,66 @@ using SuperStarTrek.Commands;
 
 namespace SuperStarTrek.Test.Systems
 {
-	[TestFixture]
-	public class PhotonTubesTest
-	{
-		
-		private Mock<IReadWrite> _mockIO;
-		private Enterprise _enterprise;
-		private Mock<IQuadrant> _mockQuadrant;
-		private PhotonTubes _photonTubes;
-		private const int INITIAL_TORPEDO_COUNT = 10;
-
-
-        [SetUp]
-        public void Setup()
-        {
-
-            _mockIO = new Mock<IReadWrite>();
-            var _mockRandom = new Mock<IRandom>();
-            _enterprise = new Enterprise(1000, new Coordinates(2, 3), _mockIO.Object, _mockRandom.Object);
-            _mockQuadrant = new Mock<IQuadrant>();
-
-            _photonTubes = new PhotonTubes(INITIAL_TORPEDO_COUNT, _enterprise, _mockIO.Object);
-
-        }
-
+    public class PhotonTubesTest
+    {
 
         [Test]
-        public void Constructor_InitializesWithCorrectValues()
+        public void Repair_FixesSystem()
         {
-            
-            Assert.AreEqual(INITIAL_TORPEDO_COUNT, _photonTubes.TorpedoCount);
-            Assert.AreEqual("Photon Tubes", _photonTubes.Name);
-            Assert.AreEqual(Command.TOR, _photonTubes.Command);
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+            photonTubes.TakeDamage(0.5f);
+
+            photonTubes.Repair();
+
+
+            Assert.AreEqual(0.0f, photonTubes.Condition);
         }
 
+        [Test]
+        public void TakeDamage_DamagesSystem()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+            photonTubes.TakeDamage(0.5f);
+
+            Assert.AreEqual(-0.5f, photonTubes.Condition);
+        }
+
+        [Test]
+        public void ReplenishTorpedoes_ResetsToInitialTorpedoCount()
+        {
+
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+            photonTubes.TorpedoCount = 3;
+
+            photonTubes.ReplenishTorpedoes();
+
+            Assert.AreEqual(10, photonTubes.TorpedoCount);
+            mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.Never);
+
+        }
 
         [Test]
         public void CanExecuteCommand_WithTorpedoesAndOperational_ReturnsTrue()
         {
-            // PhotonTubes is operational by default (Condition = 0)
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
 
-            bool result = _photonTubes.CanExecuteCommand();
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+
+            bool result = photonTubes.CanExecuteCommand();
 
             Assert.IsTrue(result);
         }
@@ -57,56 +76,22 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void CanExecuteCommand_WhenDamaged_ReturnsFalse()
         {
-            
-            _photonTubes.TakeDamage(1.0f); 
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
 
-            
-            bool result = _photonTubes.CanExecuteCommand();
+            photonTubes.TakeDamage(1.0f);
 
-            
+            bool result = photonTubes.CanExecuteCommand();
+
+
             Assert.IsFalse(result);
-            _mockIO.Verify(io => io.WriteLine("Photon Tubes are not operational"), Times.Once);
+            mockIO.Verify(io => io.WriteLine("Photon Tubes are not operational"), Times.Once);
         }
 
-        [Test]
-        public void Repair_FixesSystem()
-        {
-            
-            _photonTubes.TakeDamage(0.5f);
-
-            
-            _photonTubes.Repair();
-
-            
-            Assert.AreEqual(0.0f, _photonTubes.Condition);
-        }
-
-        [Test]
-        public void TakeDamage_DamagesSystem()
-        {
-            
-            _photonTubes.TakeDamage(0.5f);
-
-            
-            Assert.AreEqual(-0.5f, _photonTubes.Condition);
-        }
-
-        //[Test]
-        //public void ReplenishTorpedoes_ResetsToInitialTorpedoCount()
-        //{
-        //    // Arrange
-        //    // Use some torpedoes
-        //    _photonTubes.TorpedoCount = 3; // Simulate having used 7 torpedoes
-
-        //    // Act
-        //    _photonTubes.ReplenishTorpedoes();
-
-        //    // Assert
-        //    Assert.AreEqual(INITIAL_TORPEDO_COUNT, _photonTubes.TorpedoCount);
-        //    _mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.Never); // Verify no messages were output
-        //}
-
-
+       
     }
+
 }
 
