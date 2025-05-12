@@ -98,6 +98,26 @@ namespace SuperStarTrek.Test.Systems
             Assert.AreEqual(CommandResult.Ok, result);
         }
 
+        [Test]
+        public void ExecuteCommandCore_WithSameAsCurrent_Rejects()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(1000, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+            var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
+
+            shieldControl.ShieldEnergy = 300;
+            //mockEnterprise.Setup(e => e.TotalEnergy).Returns(1000);
+            mockIO.Setup(io => io.ReadNumber("Number of units to shields")).Returns(300);
+
+            var result = shieldControl.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(300, shieldControl.ShieldEnergy);
+            mockIO.Verify(io => io.WriteLine("<SHIELDS UNCHANGED>"), Times.Once);
+            Assert.AreEqual(CommandResult.Ok, result);
+        }
+
     }
 }
 
