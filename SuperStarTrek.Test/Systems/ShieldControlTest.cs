@@ -118,6 +118,26 @@ namespace SuperStarTrek.Test.Systems
             Assert.AreEqual(CommandResult.Ok, result);
         }
 
+        [Test]
+        public void ExecuteCommandCore_WithExcessiveRequest_RejectsWithMessage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(1000, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+            var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
+
+            //_mockEnterprise.Setup(e => e.TotalEnergy).Returns(1000);
+            mockIO.Setup(io => io.ReadNumber("Number of units to shields")).Returns(1500);
+
+            var result = shieldControl.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(0, shieldControl.ShieldEnergy);
+            mockIO.Verify(io => io.WriteLine("Shield Control reports, 'This is not the Federation Treasury.'"), Times.Once);
+            mockIO.Verify(io => io.WriteLine("<SHIELDS UNCHANGED>"), Times.Once);
+            Assert.AreEqual(CommandResult.Ok, result);
+        }
+
     }
 }
 
