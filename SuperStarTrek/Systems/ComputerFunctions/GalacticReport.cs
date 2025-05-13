@@ -13,7 +13,7 @@ internal abstract class GalacticReport : ComputerFunction
         Galaxy = galaxy;
     }
 
-    protected Galaxy Galaxy { get; }
+    internal Galaxy Galaxy { get; }
 
     protected abstract void WriteHeader(IQuadrant quadrant);
 

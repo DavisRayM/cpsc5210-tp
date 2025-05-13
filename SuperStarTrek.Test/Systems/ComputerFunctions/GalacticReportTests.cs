@@ -30,6 +30,27 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
 
     public class GalacticReportTests
     {
+        #region Galaxy
+
+        [Test]
+        public void GetGalaxy_Should_Return_Correct_Object()
+        {
+            Mock<Galaxy> galaxyMock = new(new Mock<IRandom>().Object);
+
+            GalacticReportTestable testGalacticReport = new(
+                "",
+                new Mock<IReadWrite>().Object,
+                galaxyMock.Object,
+                []
+            );
+
+            Assert.That(testGalacticReport.Galaxy, Is.SameAs(galaxyMock.Object));
+        }
+
+        #endregion Galaxy
+
+        #region Execute
+
         [Test]
         public void Execute_Valid_RowData_Should_Write_Correct_Lines()
         {
@@ -132,5 +153,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
                 Times.Once
             );
         }
+
+        #endregion Execute
     }
 }
