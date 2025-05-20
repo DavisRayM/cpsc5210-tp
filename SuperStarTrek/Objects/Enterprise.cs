@@ -38,11 +38,11 @@ internal class Enterprise
 
     internal string Condition => GetCondition();
 
-    internal LibraryComputer Computer => (LibraryComputer)_commandExecutors[Command.COM];
+    internal virtual LibraryComputer Computer => (LibraryComputer)_commandExecutors[Command.COM];
 
     internal ShieldControl ShieldControl => (ShieldControl)_commandExecutors[Command.SHE];
 
-    internal float Energy => TotalEnergy - ShieldControl.ShieldEnergy;
+    internal virtual float Energy => TotalEnergy - ShieldControl.ShieldEnergy;
 
     internal float TotalEnergy { get; private set; }
 
@@ -90,7 +90,7 @@ internal class Enterprise
 
     public override string ToString() => "<*>";
 
-    internal void UseEnergy(float amountUsed)
+    internal virtual void UseEnergy(float amountUsed)
     {
         TotalEnergy -= amountUsed;
     }
