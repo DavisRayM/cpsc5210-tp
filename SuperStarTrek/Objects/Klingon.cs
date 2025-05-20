@@ -15,7 +15,7 @@ internal class Klingon
         Energy = _random.NextFloat(100, 300);
     }
 
-    internal float Energy { get; private set; }
+    internal virtual float Energy { get; private set; }
 
     internal Coordinates Sector { get; private set; }
 
@@ -31,7 +31,7 @@ internal class Klingon
         return enterprise.TakeHit(Sector, hitStrength);
     }
 
-    internal bool TakeHit(int hitStrength)
+    internal virtual bool TakeHit(int hitStrength)
     {
         if (hitStrength < 0.15 * Energy) { return false; }
 

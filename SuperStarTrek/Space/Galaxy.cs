@@ -48,7 +48,7 @@ internal class Galaxy
 
     internal virtual int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
 
-    internal IEnumerable<IEnumerable<QuadrantInfo>> Quadrants => _quadrants;
+    internal virtual IEnumerable<IEnumerable<QuadrantInfo>> Quadrants => _quadrants;
 
     private static string GetQuadrantName(Coordinates coordinates) =>
         $"{_regionNames[coordinates.RegionIndex]} {_subRegionIdentifiers[coordinates.SubRegionIndex]}";
