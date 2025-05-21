@@ -11,6 +11,22 @@ namespace SuperStarTrek.Test.Objects
 {
     public class StarbaseTests
     {
+        #region ToString
+
+        [Test]
+        public void Starbase_ToString_ReturnsCorrectString()
+        {
+            Starbase testStarbase = new(
+                new Coordinates(0, 0),
+                new Mock<IRandom>().Object,
+                new Mock<IReadWrite>().Object
+            );
+
+            Assert.That(testStarbase.ToString(), Is.EqualTo(">!<"));
+        }
+
+        #endregion ToString
+
         #region TryRepair
 
         [Test]
