@@ -11,6 +11,8 @@ namespace SuperStarTrek.Test.Objects
 {
     public class StarbaseTests
     {
+        #region TryRepair
+
         [Test]
         public void TryRepair_YesToRepair_RepairsAllSystems_And_ReturnsTrue()
         {
@@ -170,5 +172,30 @@ namespace SuperStarTrek.Test.Objects
 
             ioMock.Verify(io => io.Write(Strings.RepairEstimate, 0.6f), Times.Once());
         }
+
+        #endregion TryRepair
+
+        #region ProtectEnterprise
+
+        [Test]
+        public void ProtectEnterprise_WritesTo_IO()
+        {
+            Mock<IReadWrite> ioMock = new();
+            ioMock
+                .Setup(io => io.ReadString(It.IsAny<string>()))
+                .Returns("Y");
+
+            Starbase testStarbase = new(
+                new Coordinates(0, 0),
+                new Mock<IRandom>().Object,
+                ioMock.Object
+            );
+
+            testStarbase.ProtectEnterprise();
+
+            ioMock.Verify(io => io.WriteLine(Strings.Protected), Times.Once());
+        }
+
+        #endregion ProtectEnterprise
     }
 }
