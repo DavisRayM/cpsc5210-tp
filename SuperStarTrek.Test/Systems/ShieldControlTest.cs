@@ -1,7 +1,6 @@
 ﻿using Games.Common.IO;
 using Games.Common.Randomness;
 using Moq;
-using NUnit.Framework;
 using SuperStarTrek.Commands;
 using SuperStarTrek.Objects;
 using SuperStarTrek.Space;
@@ -71,7 +70,7 @@ namespace SuperStarTrek.Test.Systems
             var mockQuadrant = new Mock<IQuadrant>();
             var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
 
-            //mockEnterprise.Setup(e => e.TotalEnergy).Returns(1000);
+       
             mockIO.Setup(io => io.ReadNumber("Number of units to shields")).Returns(500);
 
             shieldControl.ExecuteCommandCore(mockQuadrant.Object);
@@ -88,7 +87,7 @@ namespace SuperStarTrek.Test.Systems
             var mockQuadrant = new Mock<IQuadrant>();
             var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
 
-            //_mockEnterprise.Setup(e => e.TotalEnergy).Returns(1000);
+           
             mockIO.Setup(io => io.ReadNumber("Number of units to shields")).Returns(-100);
 
             var result = shieldControl.ExecuteCommandCore(mockQuadrant.Object);
@@ -108,7 +107,7 @@ namespace SuperStarTrek.Test.Systems
             var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
 
             shieldControl.ShieldEnergy = 300;
-            //mockEnterprise.Setup(e => e.TotalEnergy).Returns(1000);
+           
             mockIO.Setup(io => io.ReadNumber("Number of units to shields")).Returns(300);
 
             var result = shieldControl.ExecuteCommandCore(mockQuadrant.Object);
@@ -127,7 +126,7 @@ namespace SuperStarTrek.Test.Systems
             var mockQuadrant = new Mock<IQuadrant>();
             var shieldControl = new ShieldControl(mockEnterprise.Object, mockIO.Object);
 
-            //_mockEnterprise.Setup(e => e.TotalEnergy).Returns(1000);
+         
             mockIO.Setup(io => io.ReadNumber("Number of units to shields")).Returns(1500);
 
             var result = shieldControl.ExecuteCommandCore(mockQuadrant.Object);

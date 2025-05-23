@@ -52,7 +52,7 @@ namespace SuperStarTrek.Test.Systems
             var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
             photonTubes.TorpedoCount = 3;
 
-            photonTubes.ReplenishTorpedoes(); // TODO: verify if making set non-private is ok
+            photonTubes.ReplenishTorpedoes(); 
 
             Assert.AreEqual(10, photonTubes.TorpedoCount);
             mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.Never);
