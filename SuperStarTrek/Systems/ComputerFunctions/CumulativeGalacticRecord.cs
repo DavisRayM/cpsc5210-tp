@@ -12,7 +12,7 @@ internal class CumulativeGalacticRecord : GalacticReport
     {
     }
 
-    protected override void WriteHeader(Quadrant quadrant)
+    protected override void WriteHeader(IQuadrant quadrant)
     {
         IO.WriteLine();
         IO.WriteLine($"Computer record of galaxy for quadrant {quadrant.Coordinates}");

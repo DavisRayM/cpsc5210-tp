@@ -22,9 +22,9 @@ internal class PhaserControl : Subsystem
         _random = random;
     }
 
-    protected override bool CanExecuteCommand() => IsOperational("Phasers inoperative");
+    internal override bool CanExecuteCommand() => IsOperational("Phasers inoperative");
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {
         if (!quadrant.HasKlingons)
         {
@@ -75,7 +75,7 @@ internal class PhaserControl : Subsystem
         return phaserStrength / targetCount;
     }
 
-    private void ResolveHitOn(Klingon klingon, float perEnemyStrength, Quadrant quadrant)
+    private void ResolveHitOn(Klingon klingon, float perEnemyStrength, IQuadrant quadrant)
     {
         var distance = _enterprise.SectorCoordinates.GetDistanceTo(klingon.Sector);
         var hitStrength = (int)(perEnemyStrength / distance * (2 + _random.NextFloat()));

@@ -19,9 +19,9 @@ internal class PhotonTubes : Subsystem
         _io = io;
     }
 
-    internal int TorpedoCount { get; private set; }
+    internal int TorpedoCount { get;  set; }
 
-    protected override bool CanExecuteCommand() => HasTorpedoes() && IsOperational("{name} are not operational");
+    internal override bool CanExecuteCommand() => HasTorpedoes() && IsOperational("{name} are not operational");
 
     private bool HasTorpedoes()
     {
@@ -31,7 +31,7 @@ internal class PhotonTubes : Subsystem
         return false;
     }
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {
         if (!_io.TryReadCourse("Photon torpedo course", "Ensign Chekov", out var course))
         {

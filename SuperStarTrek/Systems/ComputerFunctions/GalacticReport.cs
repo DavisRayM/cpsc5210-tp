@@ -13,13 +13,13 @@ internal abstract class GalacticReport : ComputerFunction
         Galaxy = galaxy;
     }
 
-    protected Galaxy Galaxy { get; }
+    internal Galaxy Galaxy { get; }
 
-    protected abstract void WriteHeader(Quadrant quadrant);
+    protected abstract void WriteHeader(IQuadrant quadrant);
 
     protected abstract IEnumerable<string> GetRowData();
 
-    internal sealed override void Execute(Quadrant quadrant)
+    internal sealed override void Execute(IQuadrant quadrant)
     {
         WriteHeader(quadrant);
         IO.WriteLine("       1     2     3     4     5     6     7     8");

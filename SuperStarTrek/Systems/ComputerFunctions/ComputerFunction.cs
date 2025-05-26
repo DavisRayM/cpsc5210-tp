@@ -15,5 +15,5 @@ internal abstract class ComputerFunction
 
     protected IReadWrite IO { get; }
 
-    internal abstract void Execute(Quadrant quadrant);
+    internal abstract void Execute(IQuadrant quadrant);
 }
