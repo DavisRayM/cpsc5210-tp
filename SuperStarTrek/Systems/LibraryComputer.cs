@@ -17,9 +17,9 @@ internal class LibraryComputer : Subsystem
         _functions = functions;
     }
 
-    protected override bool CanExecuteCommand() => IsOperational("Computer disabled");
+    internal override bool CanExecuteCommand() => IsOperational("Computer disabled");
 
-    protected override CommandResult ExecuteCommandCore(Quadrant quadrant)
+    internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
     {
         var index = GetFunctionIndex();
         _io.WriteLine();
@@ -29,7 +29,7 @@ internal class LibraryComputer : Subsystem
         return CommandResult.Ok;
     }
 
-    private int GetFunctionIndex()
+    internal int GetFunctionIndex()
     {
         while (true)
         {

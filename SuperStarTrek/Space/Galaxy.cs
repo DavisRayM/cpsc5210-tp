@@ -44,20 +44,20 @@ internal class Galaxy
 
     internal QuadrantInfo this[Coordinates coordinate] => _quadrants[coordinate.X][coordinate.Y];
 
-    internal int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
+    internal virtual int KlingonCount => _quadrants.SelectMany(q => q).Sum(q => q.KlingonCount);
 
-    internal int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
+    internal virtual int StarbaseCount => _quadrants.SelectMany(q => q).Count(q => q.HasStarbase);
 
-    internal IEnumerable<IEnumerable<QuadrantInfo>> Quadrants => _quadrants;
+    internal virtual IEnumerable<IEnumerable<QuadrantInfo>> Quadrants => _quadrants;
 
     private static string GetQuadrantName(Coordinates coordinates) =>
         $"{_regionNames[coordinates.RegionIndex]} {_subRegionIdentifiers[coordinates.SubRegionIndex]}";
 
-    internal IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(Quadrant quadrant) =>
+    internal virtual IEnumerable<IEnumerable<QuadrantInfo>> GetNeighborhood(IQuadrant quadrant) =>
         Enumerable.Range(-1, 3)
             .Select(dx => dx + quadrant.Coordinates.X)
             .Select(x => GetNeighborhoodRow(quadrant, x));
-    private IEnumerable<QuadrantInfo> GetNeighborhoodRow(Quadrant quadrant, int x) =>
+    private IEnumerable<QuadrantInfo> GetNeighborhoodRow(IQuadrant quadrant, int x) =>
         Enumerable.Range(-1, 3)
             .Select(dy => dy + quadrant.Coordinates.Y)
             .Select(y => y < 0 || y > 7 || x < 0 || x > 7 ? null : _quadrants[x][y]);

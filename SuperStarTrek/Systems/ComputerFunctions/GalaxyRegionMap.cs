@@ -13,7 +13,7 @@ internal class GalaxyRegionMap : GalacticReport
     {
     }
 
-    protected override void WriteHeader(Quadrant quadrant) =>
+    protected override void WriteHeader(IQuadrant quadrant) =>
         IO.WriteLine("                        The Galaxy");
 
     protected override IEnumerable<string> GetRowData() =>

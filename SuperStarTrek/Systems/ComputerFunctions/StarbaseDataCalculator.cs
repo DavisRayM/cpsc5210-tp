@@ -15,7 +15,7 @@ internal class StarbaseDataCalculator : NavigationCalculator
         _enterprise = enterprise;
     }
 
-    internal override void Execute(Quadrant quadrant)
+    internal override void Execute(IQuadrant quadrant)
     {
         if (!quadrant.HasStarbase)
         {

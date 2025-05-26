@@ -38,21 +38,21 @@ internal class Enterprise
 
     internal string Condition => GetCondition();
 
-    internal LibraryComputer Computer => (LibraryComputer)_commandExecutors[Command.COM];
+    internal virtual LibraryComputer Computer => (LibraryComputer)_commandExecutors[Command.COM];
 
     internal ShieldControl ShieldControl => (ShieldControl)_commandExecutors[Command.SHE];
 
-    internal float Energy => TotalEnergy - ShieldControl.ShieldEnergy;
+    internal virtual float Energy => TotalEnergy - ShieldControl.ShieldEnergy;
 
     internal float TotalEnergy { get; private set; }
 
-    internal int DamagedSystemCount => _systems.Count(s => s.IsDamaged);
+    internal virtual int DamagedSystemCount => _systems.Count(s => s.IsDamaged);
 
     internal IEnumerable<Subsystem> Systems => _systems;
 
     internal PhotonTubes PhotonTubes => (PhotonTubes)_commandExecutors[Command.TOR];
 
-    internal bool IsDocked => _quadrant.EnterpriseIsNextToStarbase;
+    internal virtual bool IsDocked => _quadrant.EnterpriseIsNextToStarbase;
 
     internal bool IsStranded => TotalEnergy < 10 || Energy < 10 && ShieldControl.IsDamaged;
 
@@ -79,7 +79,7 @@ internal class Enterprise
             false => "Green"
         };
 
-    internal CommandResult Execute(Command command)
+    internal virtual CommandResult Execute(Command command)
     {
         if (command == Command.XXX) { return CommandResult.GameOver; }
 
@@ -90,7 +90,7 @@ internal class Enterprise
 
     public override string ToString() => "<*>";
 
-    internal void UseEnergy(float amountUsed)
+    internal virtual void UseEnergy(float amountUsed)
     {
         TotalEnergy -= amountUsed;
     }
