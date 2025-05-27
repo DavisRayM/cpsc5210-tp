@@ -178,6 +178,35 @@ namespace SuperStarTrek.Test.Systems
             mockIO.Verify(io => io.WriteLine("Photon Tubes are not operational"), Times.Once);
         }
 
+        [Test]
+        public void ExecuteCommandCore_WithGameOverHit_ReturnsGameOver()
+        {
+           
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+         
+            mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
+                .Returns(1)  
+                .Returns(1); 
+
+            
+            string hitMessage = "Critical hit! Game over!";
+            bool gameOver = true;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
+                       .Returns(true);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(CommandResult.GameOver, result);
+            Assert.AreEqual(9, photonTubes.TorpedoCount);
+            mockIO.Verify(io => io.WriteLine(hitMessage), Times.Once);
+            mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Never);
+        }
 
     }
 
