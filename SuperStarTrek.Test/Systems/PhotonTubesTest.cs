@@ -84,6 +84,21 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
+        public void TakeDamage_MultipleTimes_AccumulatesDamage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(5, mockEnterprise.Object, mockIO.Object);
+
+            photonTubes.TakeDamage(0.5f);
+            photonTubes.TakeDamage(0.5f);
+
+            Assert.AreEqual(-1.0f, photonTubes.Condition);
+        }
+
+        [Test]
         public void ReplenishTorpedoes_WhenCompletelyEmpty_RestoresToFullCount()
         {
 
