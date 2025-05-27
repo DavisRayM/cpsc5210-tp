@@ -147,7 +147,7 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
-        public void CanExecuteCommand_WithTorpedoesAndOperational_ReturnsTrue()
+        public void CanExecuteCommand_BothConditionsTrue_ReturnsTrue()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -158,6 +158,7 @@ namespace SuperStarTrek.Test.Systems
             bool result = photonTubes.CanExecuteCommand();
 
             Assert.IsTrue(result);
+            mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
