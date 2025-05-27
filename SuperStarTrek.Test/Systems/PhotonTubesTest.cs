@@ -54,6 +54,23 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
+        public void Repair_AfterDamage_RestoresOperationalStatus()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(5, mockEnterprise.Object, mockIO.Object);
+            photonTubes.TakeDamage(1.0f);
+
+            Assert.IsFalse(photonTubes.CanExecuteCommand());
+
+            photonTubes.Repair();
+
+            Assert.IsTrue(photonTubes.CanExecuteCommand());
+        }
+
+        [Test]
         public void TakeDamage_DamagesSystem()
         {
             var mockIO = new Mock<IReadWrite>();
