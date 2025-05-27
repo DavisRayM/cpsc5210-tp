@@ -35,6 +35,8 @@ namespace SuperStarTrek.Test.Systems
             Assert.AreEqual("Photon Tubes", photonTubes.Name);
         }
 
+        
+
         [Test]
         public void Repair_FixesSystem()
         {
@@ -113,7 +115,7 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
-        public void CanExecuteCommand_WhenDamaged_ReturnsFalse()
+        public void CanExecuteCommand_WithTorpedoesButDamaged_ReturnsFalseWithCorrectMessage()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
