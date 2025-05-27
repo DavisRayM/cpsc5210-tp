@@ -11,7 +11,17 @@ namespace SuperStarTrek.Test.Systems
 {
     public class PhotonTubesTest
     {
+        [Test]
+        public void Constructor_InitializesTorpedoCountToTubeCount()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
 
+            var photonTubes = new PhotonTubes(15, mockEnterprise.Object, mockIO.Object);
+
+            Assert.AreEqual(15, photonTubes.TorpedoCount);
+        }
         [Test]
         public void Repair_FixesSystem()
         {
