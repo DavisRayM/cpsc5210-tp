@@ -67,7 +67,7 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
-        public void ReplenishTorpedoes_ResetsToInitialTorpedoCount()
+        public void ReplenishTorpedoes_WhenCompletelyEmpty_RestoresToFullCount()
         {
 
             var mockIO = new Mock<IReadWrite>();
@@ -75,7 +75,7 @@ namespace SuperStarTrek.Test.Systems
             var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
 
             var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
-            photonTubes.TorpedoCount = 3;
+            photonTubes.TorpedoCount = 0;
 
             photonTubes.ReplenishTorpedoes(); 
 
