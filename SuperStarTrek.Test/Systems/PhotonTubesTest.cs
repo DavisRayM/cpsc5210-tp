@@ -22,6 +22,19 @@ namespace SuperStarTrek.Test.Systems
 
             Assert.AreEqual(15, photonTubes.TorpedoCount);
         }
+
+        [Test]
+        public void Constructor_SetsCorrectSystemName()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+
+            Assert.AreEqual("Photon Tubes", photonTubes.Name);
+        }
+
         [Test]
         public void Repair_FixesSystem()
         {
