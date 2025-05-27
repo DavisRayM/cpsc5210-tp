@@ -85,6 +85,20 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
+        public void ReplenishTorpedoes_WhenAlreadyFull_MaintainsFullCount()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(8, mockEnterprise.Object, mockIO.Object);
+
+            photonTubes.ReplenishTorpedoes();
+
+            Assert.AreEqual(8, photonTubes.TorpedoCount);
+        }
+
+        [Test]
         public void CanExecuteCommand_WithNoTorpedoes_ReturnsFalseAndPrintsMessage()
         {
             var mockIO = new Mock<IReadWrite>();
