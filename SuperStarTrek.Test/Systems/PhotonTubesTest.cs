@@ -272,6 +272,27 @@ namespace SuperStarTrek.Test.Systems
             mockIO.Verify(io => io.WriteLine(hitMessage), Times.Once);
             mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
         }
+
+        [Test]
+        public void ExecuteCommandCore_WithInvalidCourse_ReturnsOkWithoutFiring()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(10);
+            mockIO.Setup(io => io.WriteLine(It.IsAny<string>()));
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(CommandResult.Ok, result);
+            Assert.AreEqual(10, photonTubes.TorpedoCount); 
+            mockQuadrant.Verify(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out It.Ref<string>.IsAny, out It.Ref<bool>.IsAny), Times.Never);
+        }
+
     }
 
 }
