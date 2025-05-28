@@ -293,6 +293,38 @@ namespace SuperStarTrek.Test.Systems
             mockQuadrant.Verify(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out It.Ref<string>.IsAny, out It.Ref<bool>.IsAny), Times.Never);
         }
 
+        [Test]
+        public void ExecuteCommandCore_WithMissAndKlingonGameOver_ReturnsGameOver()
+        {
+           
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+                  .Returns(1);  
+
+            string message = "";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+                       .Returns(false);
+
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+                       .Returns(CommandResult.GameOver);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(CommandResult.GameOver, result);
+            Assert.AreEqual(9, photonTubes.TorpedoCount); 
+            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+            mockIO.Verify(io => io.WriteLine("Torpedo missed!"), Times.Once);
+            mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
+        }
+
     }
 
 }
