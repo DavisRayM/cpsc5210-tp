@@ -325,6 +325,54 @@ namespace SuperStarTrek.Test.Systems
             mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
         }
 
+        [Test]
+        public void ExecuteCommandCore_TorpedoTravelsMultipleSectors_PrintsAllSectors()
+        {
+            
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+                  .Returns(1);  
+
+            
+            var callCount = 0;
+            string hitMessage = "Target destroyed!";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
+                       .Returns(() => ++callCount > 2); 
+
+            
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+                       .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            
+            var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            
+            Assert.AreEqual(CommandResult.Ok, result);
+            Assert.AreEqual(9, photonTubes.TorpedoCount);
+
+            
+            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+
+            mockIO.Verify(io => io.WriteLine("                5 , 6"), Times.Once);
+            mockIO.Verify(io => io.WriteLine("                5 , 7"), Times.Once);
+            mockIO.Verify(io => io.WriteLine("                5 , 8"), Times.Once);
+
+            mockIO.Verify(io => io.WriteLine(hitMessage), Times.Once);
+            mockIO.Verify(io => io.WriteLine("Torpedo missed!"), Times.Never);
+
+            mockQuadrant.Verify(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out It.Ref<string>.IsAny, out It.Ref<bool>.IsAny), Times.Exactly(3));
+
+            mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
+        }
+
     }
 
 }
