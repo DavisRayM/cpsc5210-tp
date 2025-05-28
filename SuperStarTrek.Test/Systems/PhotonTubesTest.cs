@@ -425,6 +425,23 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
+        public void ExecuteCommandCore_ReadNumberPromptFormat_UsesCorrectPromptString()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.Setup(io => io.ReadNumber("Photon torpedo course (1-9)")).Returns(0); // Invalid to trigger early return
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            
+            mockIO.Verify(io => io.ReadNumber("Photon torpedo course (1-9)"), Times.Once);
+        }
+
+        [Test]
         public void ExecuteCommandCore_FloatingPointValidCourse_FiresTorpedo()
         {
             var mockIO = new Mock<IReadWrite>();
