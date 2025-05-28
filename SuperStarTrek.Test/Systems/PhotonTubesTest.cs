@@ -11,7 +11,7 @@ namespace SuperStarTrek.Test.Systems
 {
     public class PhotonTubesTest
     {
-        #region ConstructorTests
+  #region ConstructorTests
         [Test]
         public void Constructor_InitializesTorpedoCountToTubeCount()
         {
@@ -126,12 +126,10 @@ namespace SuperStarTrek.Test.Systems
 
             Assert.AreEqual(-1.0f, photonTubes.Condition);
         }
-
         #endregion DamageRepairTests
 
 
         #region TorpedoManagementTests
-
         [Test]
         public void ReplenishTorpedoes_WhenCompletelyEmpty_RestoresToFullCount()
         {
@@ -163,12 +161,10 @@ namespace SuperStarTrek.Test.Systems
 
             Assert.AreEqual(8, photonTubes.TorpedoCount);
         }
-
         #endregion TorpedoManagementTests
 
 
         #region CommandExecutionValidationTests
-
         [Test]
         public void CanExecuteCommand_WithNoTorpedoes_ReturnsFalseAndPrintsMessage()
         {
@@ -217,6 +213,35 @@ namespace SuperStarTrek.Test.Systems
             mockIO.Verify(io => io.WriteLine("Photon Tubes are not operational"), Times.Once);
         }
 
+        [Test]
+        public void ExecuteCommandCore_WithGameOverHit_ReturnsGameOver()
+        {
+           
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+         
+            mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
+                .Returns(1)  
+                .Returns(1); 
+
+            
+            string hitMessage = "Critical hit! Game over!";
+            bool gameOver = true;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
+                       .Returns(true);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(CommandResult.GameOver, result);
+            Assert.AreEqual(9, photonTubes.TorpedoCount);
+            mockIO.Verify(io => io.WriteLine(hitMessage), Times.Once);
+            mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Never);
+        }
 
         [Test]
         public void ExecuteCommandCore_WithGameOverHit_ReturnsGameOver()
