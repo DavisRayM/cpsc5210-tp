@@ -187,7 +187,6 @@ namespace SuperStarTrek.Test.Systems
             var enterprise = new Enterprise(1000, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
-         
             mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
                 .Returns(1)  
                 .Returns(1); 
@@ -206,6 +205,37 @@ namespace SuperStarTrek.Test.Systems
             Assert.AreEqual(9, photonTubes.TorpedoCount);
             mockIO.Verify(io => io.WriteLine(hitMessage), Times.Once);
             mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Never);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithValidCourse_ProcessesTorpedo()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
+                .Returns(1);  
+
+            string message = "";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+                       .Returns(false);
+
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+                       .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(CommandResult.Ok, result);
+            Assert.AreEqual(9, photonTubes.TorpedoCount);
+            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+            mockIO.Verify(io => io.WriteLine("                5 , 6"), Times.Once);
+            mockIO.Verify(io => io.WriteLine("Torpedo missed!"), Times.Once);
+            mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
         }
 
     }
