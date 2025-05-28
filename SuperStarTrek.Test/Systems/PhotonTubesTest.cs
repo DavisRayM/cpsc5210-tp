@@ -425,6 +425,36 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
+        public void ExecuteCommandCore_FloatingPointValidCourse_FiresTorpedo()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            // Test floating point values within valid range
+            mockIO.Setup(io => io.ReadNumber("Photon torpedo course (1-9)")).Returns(5.7f);
+
+            string message = "";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+                       .Returns(false);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise()).Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(CommandResult.Ok, result);
+            Assert.AreEqual(9, photonTubes.TorpedoCount); // Should fire torpedo
+
+            // Should not show error message for valid floating point course
+            mockIO.Verify(io => io.WriteLine("Ensign Chekov reports, 'Incorrect course data, sir!'"), Times.Never);
+
+            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+        }
+
+        [Test]
         public void ExecuteCommandCore_FloatingPointInvalidCourse_ShowsErrorMessage()
         {
             var mockIO = new Mock<IReadWrite>();
