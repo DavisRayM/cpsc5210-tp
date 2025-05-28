@@ -37,6 +37,19 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
+        public void Constructor_WithMaximumTorpedoes_InitializesCorrectly()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(int.MaxValue, mockEnterprise.Object, mockIO.Object);
+
+            Assert.AreEqual(int.MaxValue, photonTubes.TorpedoCount);
+            Assert.IsTrue(photonTubes.CanExecuteCommand());
+        }
+
+        [Test]
         public void Constructor_SetsCorrectSystemName()
         {
             var mockIO = new Mock<IReadWrite>();
