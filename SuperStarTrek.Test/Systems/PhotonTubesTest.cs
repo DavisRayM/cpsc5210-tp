@@ -399,6 +399,7 @@ namespace SuperStarTrek.Test.Systems
             mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
         }
 
+
         [Test]
         public void ExecuteCommandCore_WithSequenceOfInvalidInputs_HandlesGracefully()
         {
@@ -423,6 +424,32 @@ namespace SuperStarTrek.Test.Systems
             mockQuadrant.Verify(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(),
                 out It.Ref<string>.IsAny, out It.Ref<bool>.IsAny), Times.Never);
         }
+        [Test]
+        public void ExecuteCommandCore_ReadNumberReturnsBoundaryInvalidCourses_ShowsErrorMessage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            var invalidCourses = new[] { 0, -1, 10, 15, -5 };
+
+            foreach (var invalidCourse in invalidCourses)
+            {
+                mockIO.Setup(io => io.ReadNumber("Photon torpedo course (1-9)")).Returns(invalidCourse);
+
+                var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+                var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+                Assert.AreEqual(CommandResult.Ok, result, $"Should return Ok for invalid course {invalidCourse}");
+                Assert.AreEqual(10, photonTubes.TorpedoCount, $"Should not fire torpedo for invalid course {invalidCourse}");
+
+                mockIO.Verify(io => io.WriteLine("Ensign Chekov reports, 'Incorrect course data, sir!'"),
+                             Times.Once, $"Should show error message for invalid course {invalidCourse}");
+
+                mockIO.Reset(); 
+            }
+        }
 
         [Test]
         public void ExecuteCommandCore_ReadNumberPromptFormat_UsesCorrectPromptString()
@@ -432,7 +459,7 @@ namespace SuperStarTrek.Test.Systems
             var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
-            mockIO.Setup(io => io.ReadNumber("Photon torpedo course (1-9)")).Returns(0); // Invalid to trigger early return
+            mockIO.Setup(io => io.ReadNumber("Photon torpedo course (1-9)")).Returns(0); 
 
             var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
             photonTubes.ExecuteCommandCore(mockQuadrant.Object);
@@ -449,7 +476,7 @@ namespace SuperStarTrek.Test.Systems
             var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
-            // Test floating point values within valid range
+          
             mockIO.Setup(io => io.ReadNumber("Photon torpedo course (1-9)")).Returns(5.7f);
 
             string message = "";
@@ -463,9 +490,9 @@ namespace SuperStarTrek.Test.Systems
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
             Assert.AreEqual(CommandResult.Ok, result);
-            Assert.AreEqual(9, photonTubes.TorpedoCount); // Should fire torpedo
+            Assert.AreEqual(9, photonTubes.TorpedoCount); 
 
-            // Should not show error message for valid floating point course
+           
             mockIO.Verify(io => io.WriteLine("Ensign Chekov reports, 'Incorrect course data, sir!'"), Times.Never);
 
             mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
