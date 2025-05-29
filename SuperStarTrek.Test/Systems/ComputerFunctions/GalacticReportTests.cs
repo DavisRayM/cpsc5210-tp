@@ -6,6 +6,7 @@ using SuperStarTrek.Systems.ComputerFunctions;
 
 namespace SuperStarTrek.Test.Systems.ComputerFunctions
 {
+    // implementation of GalacticReport to allow testing of it
     internal class GalacticReportTestable(
         string description,
         IReadWrite io,
@@ -30,21 +31,33 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
 
     public class GalacticReportTests
     {
+        Mock<IReadWrite> _ioMock;
+        Mock<Galaxy> _galaxyMock;
+        Mock<IQuadrant> _quadrantMock;
+        GalacticReportTestable _testGalacticReport;
+        
+        [SetUp]
+        public void SetUp()
+        {
+            _ioMock = new();
+            _galaxyMock = new(new Mock<IRandom>().Object);
+
+            _quadrantMock = new();
+
+            _testGalacticReport = new(
+                "",
+                _ioMock.Object,
+                _galaxyMock.Object,
+                []
+            );
+        }
+
         #region Galaxy
 
         [Test]
         public void GetGalaxy_Should_Return_Correct_Object()
         {
-            Mock<Galaxy> galaxyMock = new(new Mock<IRandom>().Object);
-
-            GalacticReportTestable testGalacticReport = new(
-                "",
-                new Mock<IReadWrite>().Object,
-                galaxyMock.Object,
-                []
-            );
-
-            Assert.That(testGalacticReport.Galaxy, Is.SameAs(galaxyMock.Object));
+            Assert.That(_testGalacticReport.Galaxy, Is.SameAs(_galaxyMock.Object));
         }
 
         #endregion Galaxy
@@ -52,60 +65,59 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         #region Execute
 
         [Test]
-        public void Execute_Valid_RowData_Should_Write_Correct_Lines()
+        public void Execute_Valid_RowData_Should_Send_CorrectQuadrant_To_WriteHeader()
         {
-            Mock<IReadWrite> ioMock = new();
+            _testGalacticReport.RowDataToReturn = ["A", "B", "C"];
 
-            GalacticReportTestable testGalacticReport = new(
-                "",
-                ioMock.Object,
-                new Mock<Galaxy>(new Mock<IRandom>().Object).Object,
-                ["A", "B", "C"]
-            );
-
-            Mock<IQuadrant> quadrantMock = new();
-
-            testGalacticReport.Execute(quadrantMock.Object);
+            _testGalacticReport.Execute(_quadrantMock.Object);
 
             Assert.Multiple(() =>
             {
-                // verify WriteHeader was called and with correct quadrant
+                // verify WriteHeader was called with correct quadrant
 
-                Assert.That(testGalacticReport.WriteHeaderCalled);
-                Assert.That(testGalacticReport.CapturedQuadrant, Is.SameAs(quadrantMock.Object));
+                Assert.That(_testGalacticReport.WriteHeaderCalled);
+                Assert.That(_testGalacticReport.CapturedQuadrant, Is.SameAs(_quadrantMock.Object));
             });
+        }
+
+        [Test]
+        public void Execute_Valid_RowData_Should_Write_Correct_Lines()
+        {
+            _testGalacticReport.RowDataToReturn = ["A", "B", "C"];
+
+            _testGalacticReport.Execute(_quadrantMock.Object);
 
             // verify IO calls
 
-            ioMock.Verify(
+            _ioMock.Verify(
                 io => io.WriteLine(
                     "       1     2     3     4     5     6     7     8"
                 ),
                 Times.Once
             );
 
-            ioMock.Verify(
+            _ioMock.Verify(
                 io => io.WriteLine(
                     "     ----- ----- ----- ----- ----- ----- ----- -----"
                 ),
                 Times.Exactly(4)
             );
 
-            ioMock.Verify(
+            _ioMock.Verify(
                 io => io.WriteLine(
                     " 1   A"
                 ),
                 Times.Once
             );
 
-            ioMock.Verify(
+            _ioMock.Verify(
                 io => io.WriteLine(
                     " 2   B"
                 ),
                 Times.Once
             );
 
-            ioMock.Verify(
+            _ioMock.Verify(
                 io => io.WriteLine(
                     " 3   C"
                 ),
@@ -114,39 +126,34 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         }
 
         [Test]
-        public void Execute_Empty_RowData_Should_Write_Correct_Lines()
+        public void Execute_Empty_RowData_Should_Send_CorrectQuadrant_To_WriteHeader()
         {
-            Mock<IReadWrite> ioMock = new();
-
-            GalacticReportTestable testGalacticReport = new(
-                "",
-                ioMock.Object,
-                new Mock<Galaxy>(new Mock<IRandom>().Object).Object,
-                []
-            );
-
-            Mock<IQuadrant> quadrantMock = new();
-
-            testGalacticReport.Execute(quadrantMock.Object);
+            _testGalacticReport.Execute(_quadrantMock.Object);
 
             Assert.Multiple(() =>
             {
-                // verify WriteHeader was called and with correct quadrant
+                // verify WriteHeader was called with correct quadrant
 
-                Assert.That(testGalacticReport.WriteHeaderCalled);
-                Assert.That(testGalacticReport.CapturedQuadrant, Is.SameAs(quadrantMock.Object));
+                Assert.That(_testGalacticReport.WriteHeaderCalled);
+                Assert.That(_testGalacticReport.CapturedQuadrant, Is.SameAs(_quadrantMock.Object));
             });
+        }
+
+        [Test]
+        public void Execute_Empty_RowData_Should_Write_Correct_Lines()
+        {
+            _testGalacticReport.Execute(_quadrantMock.Object);
 
             // verify IO calls
 
-            ioMock.Verify(
+            _ioMock.Verify(
                 io => io.WriteLine(
                     "       1     2     3     4     5     6     7     8"
                 ),
                 Times.Once
             );
 
-            ioMock.Verify(
+            _ioMock.Verify(
                 io => io.WriteLine(
                     "     ----- ----- ----- ----- ----- ----- ----- -----"
                 ),
