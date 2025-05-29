@@ -12,63 +12,71 @@ namespace SuperStarTrek.Test.Systems
 {
     public class LibraryComputerTests
     {
-        #region CanExecuteCommand
+        internal LibraryComputer _testLibraryComputer;
+        public Mock<IReadWrite> _ioMock;
+        internal ComputerFunction[] _computerFunctionMocks;
 
-        [Test]
-        public void CanExecuteCommand_Damaged_ShouldReturnFalse()
+        [SetUp]
+        public void SetUp()
         {
-            Mock<IReadWrite> ioMock = new();
-            ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock = new();
 
             Mock<IReadWrite> ioMockForComputerFunctions = new();
 
-            ComputerFunction[] computerFunctionMocks = {
+            _computerFunctionMocks = [
                 new Mock<ComputerFunction>("description1", ioMockForComputerFunctions.Object).Object,
                 new Mock<ComputerFunction>("description2", ioMockForComputerFunctions.Object).Object,
                 new Mock<ComputerFunction>("description3", ioMockForComputerFunctions.Object).Object,
                 new Mock<ComputerFunction>("description4", ioMockForComputerFunctions.Object).Object,
                 new Mock<ComputerFunction>("description5", ioMockForComputerFunctions.Object).Object,
                 new Mock<ComputerFunction>("description6", ioMockForComputerFunctions.Object).Object
-            };
+            ];
 
-            LibraryComputer testLibraryComputer = new(
-                ioMock.Object,
-                computerFunctionMocks
+            _testLibraryComputer = new(
+                _ioMock.Object,
+                _computerFunctionMocks
             );
+        }
 
-            testLibraryComputer.TakeDamage(1);
+        #region CanExecuteCommand
 
-            Assert.That(testLibraryComputer.CanExecuteCommand(), Is.EqualTo(false));
+        [Test]
+        public void CanExecuteCommand_Damaged_ShouldReturnFalse()
+        {
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
 
-            ioMock.Verify(io => io.WriteLine("Computer disabled"), Times.Once);
+            _testLibraryComputer.TakeDamage(1);
+
+            Assert.That(_testLibraryComputer.CanExecuteCommand(), Is.EqualTo(false));
+        }
+
+        [Test]
+        public void CanExecuteCommand_Damaged_Should_Print_Disabled()
+        {
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+
+            _testLibraryComputer.TakeDamage(1);
+
+            _testLibraryComputer.CanExecuteCommand();
+
+            _ioMock.Verify(io => io.WriteLine("Computer disabled"), Times.Once);
         }
 
         // is not damaged
         [Test]
         public void CanExecuteCommand_NotDamaged_ShouldReturnTrue()
         {
-            Mock<IReadWrite> ioMock = new();
-            ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
 
-            Mock<IReadWrite> ioMockForComputerFunctions = new();
+            Assert.That(_testLibraryComputer.CanExecuteCommand(), Is.EqualTo(true));
+        }
 
-            ComputerFunction[] computerFunctionMocks = {
-                new Mock<ComputerFunction>("description1", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description2", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description3", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description4", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description5", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description6", ioMockForComputerFunctions.Object).Object
-            };
+        [Test]
+        public void CanExecuteCommand_NotDamaged_Should_Print_Disabled()
+        {
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
 
-            LibraryComputer testLibraryComputer = new(
-                ioMock.Object,
-                computerFunctionMocks
-            );
-
-            Assert.That(testLibraryComputer.CanExecuteCommand(), Is.EqualTo(true));
-
-            ioMock.Verify(io => io.WriteLine("Computer disabled"), Times.Never);
+            _ioMock.Verify(io => io.WriteLine("Computer disabled"), Times.Never);
         }
 
         #endregion CanExecuteCommand
@@ -76,31 +84,51 @@ namespace SuperStarTrek.Test.Systems
         #region ExecuteCommandCore
 
         [Test]
-        public void Valid_ExecuteCommandCore_Behaves_Correctly()
+        public void Valid_ExecuteCommandCore_Returns_Ok()
         {
-            Mock<IReadWrite> ioMock = new();
-            ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(0);
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(0);
 
-            Mock<IReadWrite> ioMockForComputerFunctions = new();
+            Mock<IQuadrant> quadrantMock = new();
 
+            Assert.That(
+                _testLibraryComputer.ExecuteCommandCore(quadrantMock.Object),
+                Is.EqualTo(CommandResult.Ok)
+            );
+        }
+
+        [Test]
+        public void Valid_ExecuteCommandCore_Prints_EmptyString()
+        {
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(0);
+
+            Mock<IQuadrant> quadrantMock = new();
+
+            _testLibraryComputer.ExecuteCommandCore(quadrantMock.Object);
+
+            _ioMock.Verify(io => io.WriteLine(""), Times.Once);
+        }
+
+        [Test]
+        public void Valid_ExecuteCommandCore_Executes_ComputerFunction()
+        {
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(0);
+
+            Mock<IReadWrite> ioMockForComputerFunction = new();
+
+            // Use this one instead of _computerFunctionMocks for verification purposes
             Mock<ComputerFunction> computerFunctionMock = new(
                 "description1",
-                ioMockForComputerFunctions.Object
+                ioMockForComputerFunction.Object
             );
 
             Mock<IQuadrant> quadrantMock = new();
 
             LibraryComputer testLibraryComputer = new(
-                ioMock.Object,
+                _ioMock.Object,
                 computerFunctionMock.Object
             );
 
-            Assert.That(
-                testLibraryComputer.ExecuteCommandCore(quadrantMock.Object),
-                Is.EqualTo(CommandResult.Ok)
-            );
-
-            ioMock.Verify(io => io.WriteLine(""), Times.Once);
+            testLibraryComputer.ExecuteCommandCore(quadrantMock.Object);
 
             computerFunctionMock.Verify(
                 computerFunction => computerFunction.Execute(quadrantMock.Object)
@@ -112,93 +140,60 @@ namespace SuperStarTrek.Test.Systems
         #region GetFunctionIndex
 
         [Test]
-        public void Valid_GetFunctionIndex_Behaves_Correctly()
+        public void Valid_GetFunctionIndex_Returns_Correct_Index()
         {
-            Mock<IReadWrite> ioMock = new();
-            ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
 
-            Mock<IReadWrite> ioMockForComputerFunctions = new();
+            Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
+        }
 
-            ComputerFunction[] computerFunctionMocks = {
-                new Mock<ComputerFunction>("description1", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description2", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description3", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description4", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description5", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description6", ioMockForComputerFunctions.Object).Object
-            };
+        [Test]
+        public void GetFunctionIndex_NegativeIndex_Returns_Correct_Index()
+        {
+            Queue<float> indices = new([-1f, 2f]);
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
 
-            LibraryComputer testLibraryComputer = new(
-                ioMock.Object,
-                computerFunctionMocks
-            );
-
-            Assert.That(testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
+            Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
         }
 
         [Test]
         public void GetFunctionIndex_NegativeIndex_Displays_ComputerFunctions()
         {
-            Mock<IReadWrite> ioMock = new();
             Queue<float> indices = new([-1f, 2f]);
-            ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
 
-            Mock<IReadWrite> ioMockForComputerFunctions = new();
+            _testLibraryComputer.GetFunctionIndex();
 
-            ComputerFunction[] computerFunctionMocks = {
-                new Mock<ComputerFunction>("description1", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description2", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description3", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description4", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description5", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description6", ioMockForComputerFunctions.Object).Object
-            };
-
-            LibraryComputer testLibraryComputer = new(
-                ioMock.Object,
-                computerFunctionMocks
-            );
-
-            Assert.That(testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
-
-            for (int i = 0; i < computerFunctionMocks.Length; i++)
+            for (int i = 0; i < _computerFunctionMocks.Length; i++)
             {
-                ioMock.Verify(
-                    io => io.WriteLine($"   {i} = {computerFunctionMocks[i].Description}"),
+                _ioMock.Verify(
+                    io => io.WriteLine($"   {i} = {_computerFunctionMocks[i].Description}"),
                     Times.Once
                 );
             }
         }
 
         [Test]
+        public void GetFunctionIndex_TooLargeIndex_Returns_Correct_Index()
+        {
+            Queue<float> indices = new([1000f, 2f]);
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
+
+            Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
+        }
+
+        [Test]
         public void GetFunctionIndex_TooLargeIndex_Displays_ComputerFunctions()
         {
-            Mock<IReadWrite> ioMock = new();
             Queue<float> indices = new([1000f, 2f]);
-            ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
+            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
 
-            Mock<IReadWrite> ioMockForComputerFunctions = new();
+            _testLibraryComputer.GetFunctionIndex();
 
-            ComputerFunction[] computerFunctionMocks = {
-                new Mock<ComputerFunction>("description1", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description2", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description3", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description4", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description5", ioMockForComputerFunctions.Object).Object,
-                new Mock<ComputerFunction>("description6", ioMockForComputerFunctions.Object).Object
-            };
-
-            LibraryComputer testLibraryComputer = new(
-                ioMock.Object,
-                computerFunctionMocks
-            );
-
-            Assert.That(testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
-
-            for (int i = 0; i < computerFunctionMocks.Length; i++)
+            for (int i = 0; i < _computerFunctionMocks.Length; i++)
             {
-                ioMock.Verify(
-                    io => io.WriteLine($"   {i} = {computerFunctionMocks[i].Description}"),
+                _ioMock.Verify(
+                    io => io.WriteLine($"   {i} = {_computerFunctionMocks[i].Description}"),
                     Times.Once
                 );
             }
