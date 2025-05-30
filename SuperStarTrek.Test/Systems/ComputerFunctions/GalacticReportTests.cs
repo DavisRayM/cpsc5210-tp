@@ -92,16 +92,18 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             _testGalacticReport.Execute(_quadrantMock.Object);
 
             // verify IO calls
-            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(
-                "       1     2     3     4     5     6     7     8\r\n" +
-                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n" +
-                " 1   A\r\n" +
-                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n" +
-                " 2   B\r\n" +
-                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n" +
-                " 3   C\r\n" +
-                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n"
-            ));
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "       1     2     3     4     5     6     7     8",
+                "     ----- ----- ----- ----- ----- ----- ----- -----",
+                " 1   A",
+                "     ----- ----- ----- ----- ----- ----- ----- -----",
+                " 2   B",
+                "     ----- ----- ----- ----- ----- ----- ----- -----",
+                " 3   C",
+                "     ----- ----- ----- ----- ----- ----- ----- -----",
+                ""
+            ])));
         }
 
         [Test]
@@ -126,10 +128,12 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             _testGalacticReport.Execute(_quadrantMock.Object);
 
             // verify IO calls
-            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(
-                "       1     2     3     4     5     6     7     8\r\n" +
-                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n"
-            ));
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "       1     2     3     4     5     6     7     8",
+                "     ----- ----- ----- ----- ----- ----- ----- -----",
+                ""
+            ])));
         }
 
         #endregion Execute
