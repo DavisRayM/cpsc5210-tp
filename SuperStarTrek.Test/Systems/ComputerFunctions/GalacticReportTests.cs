@@ -35,7 +35,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         Mock<Galaxy> _galaxyMock;
         Mock<IQuadrant> _quadrantMock;
         GalacticReportTestable _testGalacticReport;
-        
+
         [SetUp]
         public void SetUp()
         {
@@ -65,19 +65,23 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         #region Execute
 
         [Test]
+        public void Execute_Valid_RowData_Should_Call_WriteHeader()
+        {
+            _testGalacticReport.RowDataToReturn = ["A", "B", "C"];
+
+            _testGalacticReport.Execute(_quadrantMock.Object);
+
+            Assert.That(_testGalacticReport.WriteHeaderCalled);
+        }
+
+        [Test]
         public void Execute_Valid_RowData_Should_Send_CorrectQuadrant_To_WriteHeader()
         {
             _testGalacticReport.RowDataToReturn = ["A", "B", "C"];
 
             _testGalacticReport.Execute(_quadrantMock.Object);
 
-            Assert.Multiple(() =>
-            {
-                // verify WriteHeader was called with correct quadrant
-
-                Assert.That(_testGalacticReport.WriteHeaderCalled);
-                Assert.That(_testGalacticReport.CapturedQuadrant, Is.SameAs(_quadrantMock.Object));
-            });
+            Assert.That(_testGalacticReport.CapturedQuadrant, Is.SameAs(_quadrantMock.Object));
         }
 
         [Test]
