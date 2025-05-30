@@ -31,7 +31,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
 
     public class GalacticReportTests
     {
-        Mock<IReadWrite> _ioMock;
+        IOSpy _ioSpy;
         Mock<Galaxy> _galaxyMock;
         Mock<IQuadrant> _quadrantMock;
         GalacticReportTestable _testGalacticReport;
@@ -39,14 +39,14 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         [SetUp]
         public void SetUp()
         {
-            _ioMock = new();
+            _ioSpy = new();
             _galaxyMock = new(new Mock<IRandom>().Object);
 
             _quadrantMock = new();
 
             _testGalacticReport = new(
                 "",
-                _ioMock.Object,
+                _ioSpy,
                 _galaxyMock.Object,
                 []
             );
@@ -92,41 +92,24 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             _testGalacticReport.Execute(_quadrantMock.Object);
 
             // verify IO calls
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(
+                "       1     2     3     4     5     6     7     8\r\n" +
+                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n" +
+                " 1   A\r\n" +
+                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n" +
+                " 2   B\r\n" +
+                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n" +
+                " 3   C\r\n" +
+                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n"
+            ));
+        }
 
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "       1     2     3     4     5     6     7     8"
-                ),
-                Times.Once
-            );
+        [Test]
+        public void Execute_Empty_RowData_Should_Call_WriteHeader()
+        {
+            _testGalacticReport.Execute(_quadrantMock.Object);
 
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "     ----- ----- ----- ----- ----- ----- ----- -----"
-                ),
-                Times.Exactly(4)
-            );
-
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    " 1   A"
-                ),
-                Times.Once
-            );
-
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    " 2   B"
-                ),
-                Times.Once
-            );
-
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    " 3   C"
-                ),
-                Times.Once
-            );
+            Assert.That(_testGalacticReport.WriteHeaderCalled);
         }
 
         [Test]
@@ -134,13 +117,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         {
             _testGalacticReport.Execute(_quadrantMock.Object);
 
-            Assert.Multiple(() =>
-            {
-                // verify WriteHeader was called with correct quadrant
-
-                Assert.That(_testGalacticReport.WriteHeaderCalled);
-                Assert.That(_testGalacticReport.CapturedQuadrant, Is.SameAs(_quadrantMock.Object));
-            });
+            Assert.That(_testGalacticReport.CapturedQuadrant, Is.SameAs(_quadrantMock.Object));
         }
 
         [Test]
@@ -149,20 +126,10 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             _testGalacticReport.Execute(_quadrantMock.Object);
 
             // verify IO calls
-
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "       1     2     3     4     5     6     7     8"
-                ),
-                Times.Once
-            );
-
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "     ----- ----- ----- ----- ----- ----- ----- -----"
-                ),
-                Times.Once
-            );
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(
+                "       1     2     3     4     5     6     7     8\r\n" +
+                "     ----- ----- ----- ----- ----- ----- ----- -----\r\n"
+            ));
         }
 
         #endregion Execute
