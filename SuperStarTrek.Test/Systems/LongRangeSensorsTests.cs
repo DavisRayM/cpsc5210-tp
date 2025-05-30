@@ -9,7 +9,7 @@ namespace SuperStarTrek.Test.Systems
 {
     public class LongRangeSensorsTests
     {
-        Mock<IReadWrite> _ioMock;
+        IOSpy _ioSpy;
         Mock<Galaxy> _galaxyMock;
         Mock<IQuadrant> _quadrantMock;
         LongRangeSensors _testLongRangeSensors;
@@ -17,7 +17,7 @@ namespace SuperStarTrek.Test.Systems
         [SetUp]
         public void SetUp()
         {
-            _ioMock = new();
+            _ioSpy = new();
 
             _galaxyMock = new(new Mock<IRandom>().Object);
 
@@ -28,7 +28,7 @@ namespace SuperStarTrek.Test.Systems
 
             _testLongRangeSensors = new(
                 _galaxyMock.Object,
-                _ioMock.Object
+                _ioSpy
             );
         }
 
@@ -49,7 +49,11 @@ namespace SuperStarTrek.Test.Systems
 
             _testLongRangeSensors.CanExecuteCommand();
 
-            _ioMock.Verify(io => io.WriteLine("Long Range Sensors are inoperable"), Times.Once);
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "Long Range Sensors are inoperable",
+                ""
+            ])));
         }
 
         [Test]
@@ -63,7 +67,7 @@ namespace SuperStarTrek.Test.Systems
         {
             _testLongRangeSensors.CanExecuteCommand();
 
-            _ioMock.Verify(io => io.WriteLine("Long Range Sensors are inoperable"), Times.Never);
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(""));
         }
 
         #endregion CanExecuteCommand
@@ -125,11 +129,18 @@ namespace SuperStarTrek.Test.Systems
 
             _testLongRangeSensors.ExecuteCommandCore(_quadrantMock.Object);
 
-            _ioMock.Verify(io => io.WriteLine("Long range scan for quadrant 1 , 1"), Times.Once);
-            _ioMock.Verify(io => io.WriteLine("-------------------"), Times.Exactly(4));
-            _ioMock.Verify(io => io.WriteLine(": *** : 101 : 212 :"), Times.Once);
-            _ioMock.Verify(io => io.WriteLine(": 313 : 404 : *** :"), Times.Once);
-            _ioMock.Verify(io => io.WriteLine(": 616 : *** : *** :"), Times.Once);
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "Long range scan for quadrant 1 , 1",
+                "-------------------",
+                ": *** : 101 : 212 :",
+                "-------------------",
+                ": 313 : 404 : *** :",
+                "-------------------",
+                ": 616 : *** : *** :",
+                "-------------------",
+                ""
+            ])));
         }
 
         [Test]
@@ -153,8 +164,12 @@ namespace SuperStarTrek.Test.Systems
 
             _testLongRangeSensors.ExecuteCommandCore(_quadrantMock.Object);
 
-            _ioMock.Verify(io => io.WriteLine("Long range scan for quadrant 1 , 1"), Times.Once);
-            _ioMock.Verify(io => io.WriteLine("-------------------"), Times.Once);
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "Long range scan for quadrant 1 , 1",
+                "-------------------",
+                ""
+            ])));
         }
 
         #endregion ExecuteCommandCore

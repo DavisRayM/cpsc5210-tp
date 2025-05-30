@@ -13,7 +13,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         Mock<Game> _gameMock;
         Mock<Galaxy> _galaxyMock;
         Mock<Enterprise> _enterpriseMock;
-        Mock<IReadWrite> _ioMock;
+        IOSpy _ioSpy;
         StatusReport _testStatusReport; // object to test
         
         [SetUp]
@@ -37,14 +37,14 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
                 new Mock<IRandom>().Object
             );
 
-            _ioMock = new();
+            _ioSpy = new();
 
             // Object to test
             _testStatusReport = new(
                 _gameMock.Object,
                 _galaxyMock.Object,
                 _enterpriseMock.Object,
-                _ioMock.Object
+                _ioSpy
             );
         }
 
@@ -58,48 +58,17 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
 
             // Verify IO called correctly
 
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "   Status report:"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.Write(
-                    "Klingon".Pluralize(_galaxyMock.Object.KlingonCount)
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    $" left:  {_galaxyMock.Object.KlingonCount}"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    $"Mission must be completed in {_gameMock.Object.StardatesRemaining:0.#} stardates."
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.Write(
-                    $"The Federation is maintaining {_galaxyMock.Object.StarbaseCount} "
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.Write(
-                    "starbase".Pluralize(_galaxyMock.Object.StarbaseCount)
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    " in the galaxy."
-                ),
-                Times.Once
-            );
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "   Status report:",
+                "Klingon",
+                " left:  1",
+                "Mission must be completed in 1 stardates.",
+                "The Federation is maintaining 1 ",
+                "starbase",
+                " in the galaxy.",
+                ""
+            ])));
         }
 
         [Test]
@@ -126,42 +95,16 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
 
             // Verify IO called correctly
 
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "   Status report:"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.Write(
-                    "Klingon".Pluralize(_galaxyMock.Object.KlingonCount)
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    $" left:  {_galaxyMock.Object.KlingonCount}"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    $"Mission must be completed in {_gameMock.Object.StardatesRemaining:0.#} stardates."
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "Your stupidity has left you on your own in"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "  the galaxy -- you have no starbases left!"
-                ),
-                Times.Once
-            );
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "   Status report:",
+                "Klingon",
+                " left:  1",
+                "Mission must be completed in 1 stardates.",
+                "Your stupidity has left you on your own in",
+                "  the galaxy -- you have no starbases left!",
+                ""
+            ])));
         }
 
         [Test]
@@ -187,43 +130,16 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             _testStatusReport.Execute(new Mock<IQuadrant>().Object);
 
             // Verify IO called correctly
-
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "   Status report:"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.Write(
-                    "Klingon".Pluralize(_galaxyMock.Object.KlingonCount)
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    $" left:  {_galaxyMock.Object.KlingonCount}"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    $"Mission must be completed in {_gameMock.Object.StardatesRemaining:0.#} stardates."
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "Your stupidity has left you on your own in"
-                ),
-                Times.Once
-            );
-            _ioMock.Verify(
-                io => io.WriteLine(
-                    "  the galaxy -- you have no starbases left!"
-                ),
-                Times.Once
-            );
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "   Status report:",
+                "Klingon",
+                " left:  1",
+                "Mission must be completed in 1 stardates.",
+                "Your stupidity has left you on your own in",
+                "  the galaxy -- you have no starbases left!",
+                ""
+            ])));
         }
 
         [Test]
