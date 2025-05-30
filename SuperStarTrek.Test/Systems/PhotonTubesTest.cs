@@ -91,7 +91,33 @@ namespace SuperStarTrek.Test.Systems
         #region DamageRepairTests
 
         [Test]
-        public void Repair_FixesSystem()
+        public void TakeDamage_DamagesSystemCondition()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+            photonTubes.TakeDamage(0.5f);
+
+            Assert.AreEqual(-0.5f, photonTubes.Condition);
+        }
+
+        [Test]
+        public void TakeDamage_PreventsCommandExecution()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(5, mockEnterprise.Object, mockIO.Object);
+            photonTubes.TakeDamage(1.0f);
+
+            Assert.IsFalse(photonTubes.CanExecuteCommand());
+        }
+
+        [Test]
+        public void Repair_FixesSystemCondition()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -120,19 +146,6 @@ namespace SuperStarTrek.Test.Systems
             photonTubes.Repair();
 
             Assert.IsTrue(photonTubes.CanExecuteCommand());
-        }
-
-        [Test]
-        public void TakeDamage_DamagesSystem()
-        {
-            var mockIO = new Mock<IReadWrite>();
-            var mockRandom = new Mock<IRandom>();
-            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
-
-            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
-            photonTubes.TakeDamage(0.5f);
-
-            Assert.AreEqual(-0.5f, photonTubes.Condition);
         }
 
         [Test]
