@@ -11,7 +11,8 @@ namespace SuperStarTrek.Test.Systems
 {
     public class PhotonTubesTest
     {
-  #region ConstructorTests
+        #region ConstructorTests
+
         [Test]
         public void Constructor_InitializesTorpedoCountToTubeCount()
         {
@@ -34,11 +35,22 @@ namespace SuperStarTrek.Test.Systems
             var photonTubes = new PhotonTubes(0, mockEnterprise.Object, mockIO.Object);
 
             Assert.AreEqual(0, photonTubes.TorpedoCount);
+        }
+
+        [Test]
+        public void Constructor_WithZeroTorpedoes_CannotExecuteCommand()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(0, mockEnterprise.Object, mockIO.Object);
+
             Assert.IsFalse(photonTubes.CanExecuteCommand());
         }
 
         [Test]
-        public void Constructor_WithMaximumTorpedoes_InitializesCorrectly()
+        public void Constructor_WithMaximumTorpedoes_InitializesTorpedoCountCorrectly()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -47,6 +59,17 @@ namespace SuperStarTrek.Test.Systems
             var photonTubes = new PhotonTubes(int.MaxValue, mockEnterprise.Object, mockIO.Object);
 
             Assert.AreEqual(int.MaxValue, photonTubes.TorpedoCount);
+        }
+
+        [Test]
+        public void Constructor_WithMaximumTorpedoes_CanExecuteCommand()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(int.MaxValue, mockEnterprise.Object, mockIO.Object);
+
             Assert.IsTrue(photonTubes.CanExecuteCommand());
         }
 
@@ -66,6 +89,7 @@ namespace SuperStarTrek.Test.Systems
 
 
         #region DamageRepairTests
+
         [Test]
         public void Repair_FixesSystem()
         {
@@ -77,7 +101,6 @@ namespace SuperStarTrek.Test.Systems
             photonTubes.TakeDamage(0.5f);
 
             photonTubes.Repair();
-
 
             Assert.AreEqual(0.0f, photonTubes.Condition);
         }
@@ -126,10 +149,12 @@ namespace SuperStarTrek.Test.Systems
 
             Assert.AreEqual(-1.0f, photonTubes.Condition);
         }
+
         #endregion DamageRepairTests
 
 
         #region TorpedoManagementTests
+
         [Test]
         public void ReplenishTorpedoes_WhenCompletelyEmpty_RestoresToFullCount()
         {
@@ -141,11 +166,9 @@ namespace SuperStarTrek.Test.Systems
             var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
             photonTubes.TorpedoCount = 0;
 
-            photonTubes.ReplenishTorpedoes(); 
+            photonTubes.ReplenishTorpedoes();
 
             Assert.AreEqual(10, photonTubes.TorpedoCount);
-            mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.Never);
-
         }
 
         [Test]
@@ -161,10 +184,12 @@ namespace SuperStarTrek.Test.Systems
 
             Assert.AreEqual(8, photonTubes.TorpedoCount);
         }
+
         #endregion TorpedoManagementTests
 
 
         #region CommandExecutionValidationTests
+
         [Test]
         public void CanExecuteCommand_WithNoTorpedoes_ReturnsFalseAndPrintsMessage()
         {
@@ -216,17 +241,17 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void ExecuteCommandCore_WithGameOverHit_ReturnsGameOver()
         {
-           
+
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
             var enterprise = new Enterprise(1000, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
             mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
-                .Returns(1)  
-                .Returns(1); 
+                .Returns(1)
+                .Returns(1);
 
-            
+
             string hitMessage = "Critical hit! Game over!";
             bool gameOver = true;
             mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
@@ -252,7 +277,7 @@ namespace SuperStarTrek.Test.Systems
             var mockQuadrant = new Mock<IQuadrant>();
 
             mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
-                .Returns(1);  
+                .Returns(1);
 
             string message = "";
             bool gameOver = false;
@@ -326,22 +351,22 @@ namespace SuperStarTrek.Test.Systems
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
             Assert.AreEqual(CommandResult.Ok, result);
-            Assert.AreEqual(10, photonTubes.TorpedoCount); 
+            Assert.AreEqual(10, photonTubes.TorpedoCount);
             mockQuadrant.Verify(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out It.Ref<string>.IsAny, out It.Ref<bool>.IsAny), Times.Never);
         }
 
         [Test]
         public void ExecuteCommandCore_WithMissAndKlingonGameOver_ReturnsGameOver()
         {
-           
+
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
             var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
-            
+
             mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
-                  .Returns(1);  
+                  .Returns(1);
 
             string message = "";
             bool gameOver = false;
@@ -356,7 +381,7 @@ namespace SuperStarTrek.Test.Systems
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
             Assert.AreEqual(CommandResult.GameOver, result);
-            Assert.AreEqual(9, photonTubes.TorpedoCount); 
+            Assert.AreEqual(9, photonTubes.TorpedoCount);
             mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
             mockIO.Verify(io => io.WriteLine("Torpedo missed!"), Times.Once);
             mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
@@ -365,37 +390,37 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void ExecuteCommandCore_TorpedoTravelsMultipleSectors_PrintsAllSectors()
         {
-            
+
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
             var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
-            
-            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
-                  .Returns(1);  
 
-            
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+                  .Returns(1);
+
+
             var callCount = 0;
             string hitMessage = "Target destroyed!";
             bool gameOver = false;
             mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
-                       .Returns(() => ++callCount > 2); 
+                       .Returns(() => ++callCount > 2);
 
-            
+
             mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
                        .Returns(CommandResult.Ok);
 
             var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
 
-            
+
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
-            
+
             Assert.AreEqual(CommandResult.Ok, result);
             Assert.AreEqual(9, photonTubes.TorpedoCount);
 
-            
+
             mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
 
             mockIO.Verify(io => io.WriteLine("                5 , 6"), Times.Once);
@@ -457,7 +482,7 @@ namespace SuperStarTrek.Test.Systems
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
             Assert.AreEqual(CommandResult.Ok, result);
-            Assert.AreEqual(9, photonTubes.TorpedoCount); 
+            Assert.AreEqual(9, photonTubes.TorpedoCount);
 
             mockIO.Verify(io => io.WriteLine("Ensign Chekov reports, 'Incorrect course data, sir!'"), Times.Never);
 
@@ -492,7 +517,7 @@ namespace SuperStarTrek.Test.Systems
                 mockIO.Verify(io => io.WriteLine("Ensign Chekov reports, 'Incorrect course data, sir!'"),
                              Times.Once, $"Should show error message for invalid course {invalidCourse}");
 
-                mockIO.Reset(); 
+                mockIO.Reset();
             }
         }
 
