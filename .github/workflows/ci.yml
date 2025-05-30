@@ -24,4 +24,46 @@ jobs:
       run: dotnet build --configuration Debug
 
     - name: Run Tests
-      run: dotnet test --no-build --configuration Debug --verbosity normal
+      run: |
+        mkdir results
+        dotnet test --no-build --configuration Debug --verbosity normal --logger "html;logfilename=testResults.html" --results-directory results --collect:"XPlat Code Coverage"
+
+    - name: Generate coverage report
+      run: |
+        dotnet tool install --global dotnet-reportgenerator-globaltool
+        reportgenerator \
+          -reports:"results/**/coverage.cobertura.xml" \
+          -targetdir:"coverage-report" \
+          -reporttypes:"HtmlInline_AzurePipelines;TextSummary"
+
+    - name: Email Test Results
+      uses: dawidd6/action-send-mail@v5
+      if: always()
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        secure: false
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        subject: Team Project Test Results
+        to: dmuro@seattleu.edu
+        from: CPSC 5210 Team Project
+        body: Build job of ${{github.repository}} completed successfully!
+        # Optional HTML body read from file:
+        html_body: file://results/testResults.html
+
+    - name: Email Coverage Results
+      uses: dawidd6/action-send-mail@v5
+      if: always()
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        secure: false
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        subject: Team Project Coverage Results
+        to: dmuro@seattleu.edu
+        from: CPSC 5210 Team Project
+        body: Build job of ${{github.repository}} completed successfully!
+        # Optional HTML body read from file:
+        html_body: file://coverage-report/index.html

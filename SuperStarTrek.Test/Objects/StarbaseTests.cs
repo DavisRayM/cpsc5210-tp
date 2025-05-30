@@ -11,18 +11,67 @@ namespace SuperStarTrek.Test.Objects
 {
     public class StarbaseTests
     {
+        Mock<IReadWrite> _ioMock;
+        Mock<IRandom> _randomMock;
+
+        // Can't do this in SetUp because it depends on parameters
+        private Starbase CreateStarbase(float randomNextFloat, string IOYesNo)
+        {
+            _randomMock = new();
+            _randomMock
+                .Setup(random => random.NextFloat())
+                .Returns(randomNextFloat);
+
+            _ioMock = new();
+            _ioMock
+                .Setup(io => io.ReadString(It.IsAny<string>()))
+                .Returns(IOYesNo);
+
+            return new Starbase(
+                new Coordinates(0, 0),
+                _randomMock.Object,
+                _ioMock.Object
+            );
+        }
+
+        // Used in TryRepair tests
+        private static (
+            Mock<Enterprise> mockEnterprise,
+            List<Mock<Subsystem>> subsystemMocks
+        ) CreateEnterprise(int numSystems)
+        {
+            Mock<Enterprise> mockEnterprise = new(
+                1,
+                new Coordinates(1, 1),
+                new Mock<IReadWrite>().Object,
+                new Mock<IRandom>().Object
+            );
+            mockEnterprise
+                .Setup(enterprise => enterprise.DamagedSystemCount)
+                .Returns(numSystems);
+
+            List<Mock<Subsystem>> subsystemMocks = [];
+            for (int i = 0; i < numSystems; i++)
+            {
+                Mock<Subsystem> subsystemMock = new(
+                    "subystem",
+                    Command.XXX,
+                    new Mock<IReadWrite>().Object
+                );
+
+                subsystemMocks.Add(subsystemMock);
+                mockEnterprise.Object.Add(subsystemMock.Object);
+            }
+
+            return (mockEnterprise, subsystemMocks);
+        }
+
         #region ToString
 
         [Test]
         public void Starbase_ToString_ReturnsCorrectString()
         {
-            Starbase testStarbase = new(
-                new Coordinates(0, 0),
-                new Mock<IRandom>().Object,
-                new Mock<IReadWrite>().Object
-            );
-
-            Assert.That(testStarbase.ToString(), Is.EqualTo(">!<"));
+            Assert.That(CreateStarbase(0f, "Y").ToString(), Is.EqualTo(">!<"));
         }
 
         #endregion ToString
@@ -30,163 +79,92 @@ namespace SuperStarTrek.Test.Objects
         #region TryRepair
 
         [Test]
-        public void TryRepair_YesToRepair_RepairsAllSystems_And_ReturnsTrue()
+        [TestCase(1f, "Y", 5)]
+        [TestCase(0.4f, "N", 4)]
+        [TestCase(0.4f, "Y", 0)]
+        public void TryRepair_Returns_TrueIfY_Or_FalseIfN(
+            float randomNextFloat,
+            string IOYesNo,
+            int numSystems
+        )
         {
-            Mock<IRandom> randomMock = new();
-            randomMock
-                .Setup(random => random.NextFloat())
-                .Returns(1f);
-
-            Mock<IReadWrite> ioMock = new();
-            ioMock
-                .Setup(io => io.ReadString(It.IsAny<string>()))
-                .Returns("Y");
-
-            Starbase testStarbase = new(
-                new Coordinates(0, 0),
-                randomMock.Object,
-                ioMock.Object
-            );
-
-            Mock<Subsystem> systemMock1 = new("subsystem1", Command.XXX, new Mock<IReadWrite>().Object);
-            Mock<Subsystem> systemMock2 = new("subsystem2", Command.XXX, new Mock<IReadWrite>().Object);
-            Mock<Subsystem> systemMock3 = new("subsystem3", Command.XXX, new Mock<IReadWrite>().Object);
-            Mock<Subsystem> systemMock4 = new("subsystem4", Command.XXX, new Mock<IReadWrite>().Object);
-            Mock<Subsystem> systemMock5 = new("subsystem5", Command.XXX, new Mock<IReadWrite>().Object);
-
-            Mock<Enterprise> mockEnterprise = new(
-                1,
-                new Coordinates(1, 1),
-                new Mock<IReadWrite>().Object,
-                new Mock<IRandom>().Object
-            );
-            mockEnterprise
-                .Setup(enterprise => enterprise.DamagedSystemCount)
-                .Returns(5);
-            mockEnterprise.Object.Add(systemMock1.Object);
-            mockEnterprise.Object.Add(systemMock2.Object);
-            mockEnterprise.Object.Add(systemMock3.Object);
-            mockEnterprise.Object.Add(systemMock4.Object);
-            mockEnterprise.Object.Add(systemMock5.Object);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(testStarbase.TryRepair(mockEnterprise.Object, out float repairTimeResult));
-
-                // repairTime should be truncated to 0.9f if >= 1
-                Assert.That(repairTimeResult, Is.EqualTo(0.9f));
-            });
-
-            ioMock.Verify(io => io.Write(Strings.RepairEstimate, 0.9f), Times.Once());
-
-            // all systems repaired
-            systemMock1.Verify(system => system.Repair(), Times.Once);
-            systemMock2.Verify(system => system.Repair(), Times.Once);
-            systemMock3.Verify(system => system.Repair(), Times.Once);
-            systemMock4.Verify(system => system.Repair(), Times.Once);
+            Assert.That(CreateStarbase(randomNextFloat, IOYesNo).TryRepair(
+                CreateEnterprise(numSystems).mockEnterprise.Object,
+                out float repairTimeResult
+            ), Is.EqualTo(IOYesNo == "Y"));
         }
 
         [Test]
-        public void TryRepair_NoToRepair_DoesNotRepairSystems_And_ReturnsFalse()
+        [TestCase(1f, "Y", 5, 0.9f)]
+        [TestCase(0.4f, "N", 4, 0f)]
+        [TestCase(0.4f, "Y", 0, 0.2f)]
+        public void TryRepair_Returns_Correct_RepairTime(
+            float randomNextFloat,
+            string IOYesNo,
+            int numSystems,
+            float expectedRepairTimeReturned
+        )
         {
-            Mock<IRandom> randomMock = new();
-            randomMock
-                .Setup(random => random.NextFloat())
-                .Returns(0.4f);
-
-            Mock<IReadWrite> ioMock = new();
-            ioMock
-                .Setup(io => io.ReadString(It.IsAny<string>()))
-                .Returns("N");
-
-            Starbase testStarbase = new(
-                new Coordinates(0, 0),
-                randomMock.Object,
-                ioMock.Object
+            CreateStarbase(randomNextFloat, IOYesNo).TryRepair(
+                CreateEnterprise(numSystems).mockEnterprise.Object,
+                out float repairTimeResult
             );
 
-            Mock<Subsystem> systemMock1 = new("subsystem1", Command.XXX, new Mock<IReadWrite>().Object);
-            Mock<Subsystem> systemMock2 = new("subsystem2", Command.XXX, new Mock<IReadWrite>().Object);
-            Mock<Subsystem> systemMock3 = new("subsystem3", Command.XXX, new Mock<IReadWrite>().Object);
-            Mock<Subsystem> systemMock4 = new("subsystem4", Command.XXX, new Mock<IReadWrite>().Object);
-
-            Mock<Enterprise> mockEnterprise = new(
-                1,
-                new Coordinates(1, 1),
-                new Mock<IReadWrite>().Object,
-                new Mock<IRandom>().Object
-            );
-            mockEnterprise
-                .Setup(enterprise => enterprise.DamagedSystemCount)
-                .Returns(4);
-            mockEnterprise.Object.Add(systemMock1.Object);
-            mockEnterprise.Object.Add(systemMock2.Object);
-            mockEnterprise.Object.Add(systemMock3.Object);
-            mockEnterprise.Object.Add(systemMock4.Object);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(
-                    testStarbase.TryRepair(mockEnterprise.Object, out float repairTimeResult),
-                    Is.False
-                );
-
-                Assert.That(
-                    repairTimeResult,
-                    Is.EqualTo(0)
-                );
-            });
-
-            ioMock.Verify(
-                io => io.Write(Strings.RepairEstimate,
-                0.6f
-            ), Times.Once());
-
-            // systems not repaired
-            systemMock1.Verify(system => system.Repair(), Times.Never);
-            systemMock2.Verify(system => system.Repair(), Times.Never);
-            systemMock3.Verify(system => system.Repair(), Times.Never);
-            systemMock4.Verify(system => system.Repair(), Times.Never);
+            Assert.That(repairTimeResult, Is.EqualTo(expectedRepairTimeReturned));
         }
 
         [Test]
-        public void TryRepair_NoSystems_BehavesCorrectly()
+        [TestCase(1f, "Y", 5, 0.9f)]
+        [TestCase(0.4f, "N", 4, 0.6f)]
+        [TestCase(0.4f, "Y", 0, 0.2f)]
+        public void TryRepair_Prints_Correct_RepairEstimate(
+            float randomNextFloat,
+            string IOYesNo,
+            int numSystems,
+            float expectedRepairTimePrinted
+        )
         {
-            Mock<IRandom> randomMock = new();
-            randomMock
-                .Setup(random => random.NextFloat())
-                .Returns(0.4f);
-
-            Mock<IReadWrite> ioMock = new();
-            ioMock
-                .Setup(io => io.ReadString(It.IsAny<string>()))
-                .Returns("Y");
-
-            Starbase testStarbase = new(
-                new Coordinates(0, 0),
-                randomMock.Object,
-                ioMock.Object
+            CreateStarbase(randomNextFloat, IOYesNo).TryRepair(
+                CreateEnterprise(numSystems).mockEnterprise.Object,
+                out float repairTimeResult
             );
 
-            Mock<Enterprise> mockEnterprise = new(
-                1,
-                new Coordinates(1, 1),
-                new Mock<IReadWrite>().Object,
-                new Mock<IRandom>().Object
+            _ioMock.Verify(
+                io => io.Write(
+                    Strings.RepairEstimate,
+                    expectedRepairTimePrinted
+                ), Times.Once()
             );
-            mockEnterprise
-                .Setup(enterprise => enterprise.DamagedSystemCount)
-                .Returns(4);
+        }
 
-            Assert.Multiple(() =>
+        [Test]
+        [TestCase(1f, "Y", 5)]
+        [TestCase(0.4f, "N", 4)]
+        [TestCase(0.4f, "Y", 0)]
+        public void TryRepair_RepairsSubsystems(
+            float randomNextFloat,
+            string IOYesNo,
+            int numSystems
+        )
+        {
+            (
+                Mock<Enterprise> mockEnterprise,
+                List<Mock<Subsystem>> subsystemMocks
+            ) = CreateEnterprise(numSystems);
+
+            CreateStarbase(randomNextFloat, IOYesNo).TryRepair(
+                mockEnterprise.Object,
+                out float repairTimeResult
+            );
+
+            // all systems repaired only if IO got "Y"
+            foreach (Mock<Subsystem> subsystemMock in subsystemMocks)
             {
-                Assert.That(testStarbase.TryRepair(mockEnterprise.Object, out float repairTimeResult));
-
-                // repairTime should be truncated to 0.9f if >= 1
-                Assert.That(repairTimeResult, Is.EqualTo(0.6f));
-            });
-
-            ioMock.Verify(io => io.Write(Strings.RepairEstimate, 0.6f), Times.Once());
+                subsystemMock.Verify(
+                    system => system.Repair(),
+                    IOYesNo == "Y" ? Times.Once : Times.Never
+                );
+            }
         }
 
         #endregion TryRepair
@@ -196,20 +174,9 @@ namespace SuperStarTrek.Test.Objects
         [Test]
         public void ProtectEnterprise_WritesTo_IO()
         {
-            Mock<IReadWrite> ioMock = new();
-            ioMock
-                .Setup(io => io.ReadString(It.IsAny<string>()))
-                .Returns("Y");
+            CreateStarbase(0f, "Y").ProtectEnterprise();
 
-            Starbase testStarbase = new(
-                new Coordinates(0, 0),
-                new Mock<IRandom>().Object,
-                ioMock.Object
-            );
-
-            testStarbase.ProtectEnterprise();
-
-            ioMock.Verify(io => io.WriteLine(Strings.Protected), Times.Once());
+            _ioMock.Verify(io => io.WriteLine(Strings.Protected), Times.Once());
         }
 
         #endregion ProtectEnterprise
