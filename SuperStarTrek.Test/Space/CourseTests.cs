@@ -1,9 +1,4 @@
 ﻿using SuperStarTrek.Space;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SuperStarTrek.Test.Space
 {
@@ -20,7 +15,13 @@ namespace SuperStarTrek.Test.Space
             float direction
         )
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Course(direction));
+            Assert.That(() => new Course(direction),
+                Throws.TypeOf<ArgumentOutOfRangeException>()
+                    .With.Message.EqualTo(string.Join(Environment.NewLine,
+                        [
+                            "Must be between 1 and 9, inclusive. (Parameter 'direction')",
+                            "Actual value was " + direction + "."
+                        ])));
         }
 
         [Test]
