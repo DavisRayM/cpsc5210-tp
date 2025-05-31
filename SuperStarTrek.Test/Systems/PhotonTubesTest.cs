@@ -711,7 +711,7 @@ namespace SuperStarTrek.Test.Systems
         #endregion ExecuteCommandCoreHitTests
 
 
-        #region ExecuteCommandInvalidCourseTests
+        #region ExecuteCommandCoreInvalidCourseTests
 
         [Test]
         public void ExecuteCommandCore_WithInvalidCourse_ReturnsOk()
@@ -768,10 +768,10 @@ namespace SuperStarTrek.Test.Systems
         }
 
 
-        #endregion ExecuteCommandInvalidCourseTests
+        #endregion ExecuteCommandCoreInvalidCourseTests
 
 
-        #region ExecuteCommandMissTests
+        #region ExecuteCommandCoreMissTests
 
         [Test]
         public void ExecuteCommandCore_WithMissAndKlingonGameOver_ReturnsGameOver()
@@ -898,7 +898,7 @@ namespace SuperStarTrek.Test.Systems
             mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
         }
 
-        #endregion ExecuteCommandMissTests
+        #endregion ExecuteCommandCoreMissTests
 
 
         #region ExecuteCommandCoreTorpedoTravelsMultipleSectors
