@@ -201,10 +201,10 @@ namespace SuperStarTrek.Test.Systems
         #endregion TorpedoManagementTests
 
 
-        #region CommandExecutionValidationTests
+        #region CanExecuteCommandTests
 
         [Test]
-        public void CanExecuteCommand_WithNoTorpedoes_ReturnsFalseAndPrintsMessage()
+        public void CanExecuteCommand_WithNoTorpedoes_ReturnsFalse()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -215,12 +215,24 @@ namespace SuperStarTrek.Test.Systems
             bool result = photonTubes.CanExecuteCommand();
 
             Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void CanExecuteCommand_WithNoTorpedoes_PrintsExpendedMessage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(0, mockEnterprise.Object, mockIO.Object);
+
+            photonTubes.CanExecuteCommand();
 
             mockIO.Verify(io => io.WriteLine("All photon torpedoes expended"), Times.Once);
         }
 
         [Test]
-        public void CanExecuteCommand_BothConditionsTrue_ReturnsTrue()
+        public void CanExecuteCommand_WithTorpedoesAndOperational_ReturnsTrue()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -231,11 +243,24 @@ namespace SuperStarTrek.Test.Systems
             bool result = photonTubes.CanExecuteCommand();
 
             Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void CanExecuteCommand_WithTorpedoesAndOperational_DoesNotPrintMessage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+
+            photonTubes.CanExecuteCommand();
+
             mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.Never);
         }
 
         [Test]
-        public void CanExecuteCommand_WithTorpedoesButDamaged_ReturnsFalseWithCorrectMessage()
+        public void CanExecuteCommand_WithTorpedoesButDamaged_ReturnsFalse()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -246,10 +271,25 @@ namespace SuperStarTrek.Test.Systems
 
             bool result = photonTubes.CanExecuteCommand();
 
-
             Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void CanExecuteCommand_WithTorpedoesButDamaged_PrintsNotOperationalMessage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var mockEnterprise = new Mock<Enterprise>(10, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var photonTubes = new PhotonTubes(10, mockEnterprise.Object, mockIO.Object);
+
+            photonTubes.TakeDamage(1.0f);
+
+            photonTubes.CanExecuteCommand();
+
             mockIO.Verify(io => io.WriteLine("Photon Tubes are not operational"), Times.Once);
         }
+
+        #endregion CanExecuteCommandTests
 
         [Test]
         public void ExecuteCommandCore_WithGameOverHit_ReturnsGameOver()
@@ -561,10 +601,8 @@ namespace SuperStarTrek.Test.Systems
             mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Never);
         }
 
-        #endregion CommandExecutionValidationTests
 
-
-        #region CommandExecutionReadNumberPromptTests
+     
 
         [Test]
         public void ExecuteCommandCore_ReadNumberPromptFormat_UsesCorrectPromptString()
@@ -640,7 +678,7 @@ namespace SuperStarTrek.Test.Systems
             }
         }
 
-        #endregion CommandExecutionReadNumberPromptTests
+        
     }
 
 }
