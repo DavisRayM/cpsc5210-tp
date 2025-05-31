@@ -1,9 +1,4 @@
 ﻿using SuperStarTrek.Space;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SuperStarTrek.Test.Space
 {
@@ -20,12 +15,19 @@ namespace SuperStarTrek.Test.Space
             float direction
         )
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new Course(direction));
+            Assert.That(() => new Course(direction),
+                Throws.TypeOf<ArgumentOutOfRangeException>()
+                    .With.Message.EqualTo(string.Join(Environment.NewLine,
+                        [
+                            "Must be between 1 and 9, inclusive. (Parameter 'direction')",
+                            "Actual value was " + direction + "."
+                        ])));
         }
 
         [Test]
         [TestCase(1, 0)]
         [TestCase(5.5f, 0.5f)]
+        [TestCase(6.5f, 1)]
         [TestCase(9, 0)]
         public void Valid_Direction_In_Course_Constructor_Should_Correctly_Set_DeltaX(
             float direction, float expectedDeltaX
@@ -38,6 +40,7 @@ namespace SuperStarTrek.Test.Space
         [Test]
         [TestCase(1, 1)]
         [TestCase(5.5f, -1)]
+        [TestCase(6.5f, -0.5f)]
         [TestCase(9, 1)]
         public void Valid_Direction_In_Course_Constructor_Should_Correctly_Set_DeltaY(
             float direction, float expectedDeltaY

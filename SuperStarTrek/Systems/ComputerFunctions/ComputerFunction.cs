@@ -13,7 +13,7 @@ internal abstract class ComputerFunction
 
     internal string Description { get; }
 
-    protected IReadWrite IO { get; }
+    internal IReadWrite IO { get; }
 
     internal abstract void Execute(IQuadrant quadrant);
 }
