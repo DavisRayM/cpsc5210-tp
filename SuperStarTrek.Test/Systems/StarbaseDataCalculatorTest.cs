@@ -6,7 +6,7 @@ using SuperStarTrek.Objects;
 using SuperStarTrek.Space;
 using SuperStarTrek.Systems.ComputerFunctions;
 
-namespace SuperStarTrek.Test.Systems.ComputerFunctions
+namespace SuperStarTrek.Test.Systems
 {
 	public class StarbaseDataCalculatorTest
 	{
