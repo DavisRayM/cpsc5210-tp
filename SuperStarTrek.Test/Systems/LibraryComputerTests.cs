@@ -142,9 +142,9 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Valid_GetFunctionIndex_Returns_Correct_Index()
         {
-            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(5);
 
-            Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
+            Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(5));
         }
 
         [Test]
