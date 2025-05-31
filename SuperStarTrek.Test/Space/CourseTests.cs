@@ -27,6 +27,7 @@ namespace SuperStarTrek.Test.Space
         [Test]
         [TestCase(1, 0)]
         [TestCase(5.5f, 0.5f)]
+        [TestCase(6.5f, 1)]
         [TestCase(9, 0)]
         public void Valid_Direction_In_Course_Constructor_Should_Correctly_Set_DeltaX(
             float direction, float expectedDeltaX
@@ -39,6 +40,7 @@ namespace SuperStarTrek.Test.Space
         [Test]
         [TestCase(1, 1)]
         [TestCase(5.5f, -1)]
+        [TestCase(6.5f, -0.5f)]
         [TestCase(9, 1)]
         public void Valid_Direction_In_Course_Constructor_Should_Correctly_Set_DeltaY(
             float direction, float expectedDeltaY
