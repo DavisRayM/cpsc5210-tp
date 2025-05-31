@@ -394,6 +394,7 @@ namespace SuperStarTrek.Test.Systems
 
         #endregion ExecuteCommandCoreGameOverTests
 
+
         #region ExecuteCommandCoreValidCourseTests
 
         [Test]
@@ -532,28 +533,22 @@ namespace SuperStarTrek.Test.Systems
             mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
         }
 
-        #endregion ExecuteCommandCoreHitTests
-
         [Test]
-        public void ExecuteCommandCore_WithHit_ReturnsOkAndPrintsMessage()
+        public void ExecuteCommandCore_WithHit_ReturnsOk()
         {
-
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
             var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
-
             mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
                 .Returns(1)
                 .Returns(1);
-
 
             string hitMessage = "Klingon destroyed!";
             bool gameOver = false;
             mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
                        .Returns(true);
-
             mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
                .Returns(CommandResult.Ok);
 
@@ -562,15 +557,119 @@ namespace SuperStarTrek.Test.Systems
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
             Assert.AreEqual(CommandResult.Ok, result);
-            Assert.AreEqual(9, photonTubes.TorpedoCount);
-            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
-            mockIO.Verify(io => io.WriteLine(It.Is<string>(s => s.Contains("5 , 6"))), Times.Once);
-            mockIO.Verify(io => io.WriteLine(hitMessage), Times.Once);
-            mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
         }
 
         [Test]
-        public void ExecuteCommandCore_WithInvalidCourse_ReturnsOkWithoutFiring()
+        public void ExecuteCommandCore_WithHit_DecrementsTorpedoCount()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
+                .Returns(1)
+                .Returns(1);
+
+            string hitMessage = "Klingon destroyed!";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
+                       .Returns(true);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+               .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(9, photonTubes.TorpedoCount);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithHit_PrintsTorpedoTrackHeader()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
+                .Returns(1)
+                .Returns(1);
+
+            string hitMessage = "Klingon destroyed!";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
+                       .Returns(true);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+               .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithHit_PrintsTorpedoPosition()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
+                .Returns(1)
+                .Returns(1);
+
+            string hitMessage = "Klingon destroyed!";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
+                       .Returns(true);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+               .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine(It.Is<string>(s => s.Contains("5 , 6"))), Times.Once);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithHit_PrintsHitMessage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.SetupSequence(io => io.ReadNumber(It.IsAny<string>()))
+                .Returns(1)
+                .Returns(1);
+
+            string hitMessage = "Klingon destroyed!";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out hitMessage, out gameOver))
+                       .Returns(true);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+               .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine(hitMessage), Times.Once);
+        }
+
+        #endregion ExecuteCommandCoreHitTests
+
+
+        #region ExecuteCommandInvalidCourseTests
+
+        [Test]
+        public void ExecuteCommandCore_WithInvalidCourse_ReturnsOk()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -585,19 +684,90 @@ namespace SuperStarTrek.Test.Systems
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
             Assert.AreEqual(CommandResult.Ok, result);
-            Assert.AreEqual(10, photonTubes.TorpedoCount);
-            mockQuadrant.Verify(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out It.Ref<string>.IsAny, out It.Ref<bool>.IsAny), Times.Never);
         }
 
         [Test]
-        public void ExecuteCommandCore_WithMissAndKlingonGameOver_ReturnsGameOver()
+        public void ExecuteCommandCore_WithInvalidCourse_DoesNotDecrementTorpedoCount()
         {
-
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
             var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
 
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(10);
+            mockIO.Setup(io => io.WriteLine(It.IsAny<string>()));
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            Assert.AreEqual(10, photonTubes.TorpedoCount);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithInvalidCourse_DoesNotCheckForTorpedoCollision()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(10);
+            mockIO.Setup(io => io.WriteLine(It.IsAny<string>()));
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            mockQuadrant.Verify(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out It.Ref<string>.IsAny, out It.Ref<bool>.IsAny), Times.Never);
+        }
+
+
+        #endregion ExecuteCommandInvalidCourseTests
+
+
+
+        //[Test]
+        //public void ExecuteCommandCore_WithMissAndKlingonGameOver_ReturnsGameOver()
+        //{
+
+        //    var mockIO = new Mock<IReadWrite>();
+        //    var mockRandom = new Mock<IRandom>();
+        //    var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+        //    var mockQuadrant = new Mock<IQuadrant>();
+
+
+        //    mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+        //          .Returns(1);
+
+        //    string message = "";
+        //    bool gameOver = false;
+        //    mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+        //               .Returns(false);
+
+        //    mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+        //               .Returns(CommandResult.GameOver);
+
+        //    var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+        //    var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+        //    Assert.AreEqual(CommandResult.GameOver, result);
+        //    Assert.AreEqual(9, photonTubes.TorpedoCount);
+        //    mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+        //    mockIO.Verify(io => io.WriteLine("Torpedo missed!"), Times.Once);
+        //    mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
+        //}
+
+        #region ExecuteCommandMissTests
+
+        [Test]
+        public void ExecuteCommandCore_WithMissAndKlingonGameOver_ReturnsGameOver()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
 
             mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
                   .Returns(1);
@@ -606,7 +776,6 @@ namespace SuperStarTrek.Test.Systems
             bool gameOver = false;
             mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
                        .Returns(false);
-
             mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
                        .Returns(CommandResult.GameOver);
 
@@ -615,11 +784,109 @@ namespace SuperStarTrek.Test.Systems
             var result = photonTubes.ExecuteCommandCore(mockQuadrant.Object);
 
             Assert.AreEqual(CommandResult.GameOver, result);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithMiss_DecrementsTorpedoCount()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+                  .Returns(1);
+
+            string message = "";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+                       .Returns(false);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+                       .Returns(CommandResult.GameOver);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
             Assert.AreEqual(9, photonTubes.TorpedoCount);
-            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithMiss_PrintsMissMessage()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+                  .Returns(1);
+
+            string message = "";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+                       .Returns(false);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+                       .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
             mockIO.Verify(io => io.WriteLine("Torpedo missed!"), Times.Once);
+        }
+
+        [Test]
+        public void ExecuteCommandCore_WithMiss_CallsKlingonsFire()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+                  .Returns(1);
+
+            string message = "";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+                       .Returns(false);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+                       .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
             mockQuadrant.Verify(q => q.KlingonsFireOnEnterprise(), Times.Once);
         }
+
+        [Test]
+        public void ExecuteCommandCore_WithMiss_PrintsTorpedoTrackHeader()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(1000, new Coordinates(4, 4), mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+
+            mockIO.Setup(io => io.ReadNumber(It.IsAny<string>()))
+                  .Returns(1);
+
+            string message = "";
+            bool gameOver = false;
+            mockQuadrant.Setup(q => q.TorpedoCollisionAt(It.IsAny<Coordinates>(), out message, out gameOver))
+                       .Returns(false);
+            mockQuadrant.Setup(q => q.KlingonsFireOnEnterprise())
+                       .Returns(CommandResult.Ok);
+
+            var photonTubes = new PhotonTubes(10, enterprise, mockIO.Object);
+
+            photonTubes.ExecuteCommandCore(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
+        }
+
+        #endregion ExecuteCommandMissTests
 
         [Test]
         public void ExecuteCommandCore_TorpedoTravelsMultipleSectors_PrintsAllSectors()
