@@ -38,6 +38,40 @@ namespace SuperStarTrek.Test.Systems
             );
         }
 
+        #region Constructor
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Name()
+        {
+            Assert.That(_testLibraryComputer.Name, Is.EqualTo("Library-Computer"));
+        }
+        
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Command()
+        {
+            Assert.That(_testLibraryComputer.Command, Is.EqualTo(Command.COM));
+        }
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Condition()
+        {
+            Assert.That(_testLibraryComputer.Condition, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_IO()
+        {
+            Assert.That(_testLibraryComputer._io, Is.EqualTo(_ioMock.Object));
+        }
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Functions()
+        {
+            Assert.That(_testLibraryComputer._functions, Is.EqualTo(_computerFunctionMocks));
+        }
+
+        #endregion Constructor
+
         #region CanExecuteCommand
 
         [Test]
