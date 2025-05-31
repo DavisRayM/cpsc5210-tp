@@ -6,7 +6,7 @@ namespace SuperStarTrek.Systems;
 
 internal abstract class Subsystem
 {
-    private readonly IReadWrite _io;
+    internal readonly IReadWrite _io;
 
     protected Subsystem(string name, Command command, IReadWrite io)
     {
