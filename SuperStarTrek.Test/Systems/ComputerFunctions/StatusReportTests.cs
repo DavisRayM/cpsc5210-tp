@@ -48,6 +48,42 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             );
         }
 
+        #region Constructor
+
+        [Test]
+        public void StatusReport_Constructor_Should_CorrectlySet_Description()
+        {
+            Assert.That(_testStatusReport.Description, Is.EqualTo("Status report"));
+        }
+
+        [Test]
+        public void StatusReport_Constructor_Should_CorrectlySet_IO()
+        {
+            Assert.That(_testStatusReport.IO, Is.EqualTo(_ioSpy));
+        }
+
+        [Test]
+        public void StatusReport_Constructor_Should_CorrectlySet_Game()
+        {
+            Assert.That(_testStatusReport._game, Is.EqualTo(_gameMock.Object));
+        }
+
+        [Test]
+        public void StatusReport_Constructor_Should_CorrectlySet_Galaxy()
+        {
+            Assert.That(_testStatusReport._galaxy, Is.EqualTo(_galaxyMock.Object));
+        }
+
+        [Test]
+        public void StatusReport_Constructor_Should_CorrectlySet_Enterprise()
+        {
+            Assert.That(_testStatusReport._enterprise, Is.EqualTo(_enterpriseMock.Object));
+        }
+
+        #endregion Constructor
+
+        #region Execute
+
         [Test]
         public void Execute_StarbaseCount_GreaterThan0_ShouldPrint_CorrectLines()
         {
@@ -155,5 +191,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
                 enterprise => enterprise.Execute(Command.DAM)
             );
         }
+
+        #endregion Execute
     }
 }
