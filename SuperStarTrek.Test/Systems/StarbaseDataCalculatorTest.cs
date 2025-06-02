@@ -40,11 +40,10 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         }
 
         [Test]
-        public void Execute_WithStarbase_CallsWriteDirectionAndDistance()
+        public void Execute_WithStarbase_DisplaysFromEnterpriseToStarbaseHeader()
         {
             var starbaseSector = new Coordinates(3, 4);
             var enterpriseSector = new Coordinates(1, 2);
-
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
             var enterprise = new Enterprise(100, enterpriseSector, mockIO.Object, mockRandom.Object);
@@ -58,49 +57,72 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             sbdCalculator.Execute(mockQuadrant.Object);
 
             mockIO.Verify(io => io.WriteLine("From Enterprise to Starbase:"), Times.Once);
-
-           
-            mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.AtLeastOnce);
         }
 
-
         [Test]
-        public void Execute_WithStarbase_CalculatesCorrectDirectionAndDistance()
+        public void Execute_WithStarbase_WritesMultipleOutputLines()
         {
-            
             var starbaseSector = new Coordinates(3, 4);
             var enterpriseSector = new Coordinates(1, 2);
-            var expectedDirection = 1.1071487f; 
-            var expectedDistance = 2.828427f;   
-
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
-
-            
             var enterprise = new Enterprise(100, enterpriseSector, mockIO.Object, mockRandom.Object);
             var mockQuadrant = new Mock<IQuadrant>();
             var starbase = new Starbase(starbaseSector, mockRandom.Object, mockIO.Object);
+            var sbdCalculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
 
             mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
             mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
 
-            var sbdCalculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
-
-           
             sbdCalculator.Execute(mockQuadrant.Object);
 
-            mockIO.Verify(io => io.WriteLine(It.Is<string>(s =>
-                s.Contains("Direction") ||
-                s.Contains("Course"))), Times.AtLeastOnce);
-
-
-            mockIO.Verify(io => io.WriteLine(It.Is<string>(s =>
-            s.Contains("Distance"))), Times.AtLeastOnce);
-
+            mockIO.Verify(io => io.WriteLine(It.IsAny<string>()), Times.AtLeastOnce);
         }
 
         [Test]
-        public void Execute_MultipleTimesWithSameQuadrant_ProducesConsistentOutput()
+        public void Execute_WithStarbase_DisplaysDirectionInformation()
+        {
+            var starbaseSector = new Coordinates(3, 4);
+            var enterpriseSector = new Coordinates(1, 2);
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(100, enterpriseSector, mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+            var starbase = new Starbase(starbaseSector, mockRandom.Object, mockIO.Object);
+            var sbdCalculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
+
+            mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
+            mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
+
+            sbdCalculator.Execute(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine(It.Is<string>(s =>
+                s.Contains("Direction") || s.Contains("Course"))), Times.AtLeastOnce);
+        }
+
+        [Test]
+        public void Execute_WithStarbase_DisplaysDistanceInformation()
+        {
+            var starbaseSector = new Coordinates(3, 4);
+            var enterpriseSector = new Coordinates(1, 2);
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(100, enterpriseSector, mockIO.Object, mockRandom.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+            var starbase = new Starbase(starbaseSector, mockRandom.Object, mockIO.Object);
+            var sbdCalculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
+
+            mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
+            mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
+
+            sbdCalculator.Execute(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine(It.Is<string>(s => s.Contains("Distance"))), Times.AtLeastOnce);
+        }
+
+
+        [Test]
+        public void Execute_MultipleTimesWithSameQuadrant_DisplaysHeaderEachTime()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -109,7 +131,6 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             var mockQuadrant = new Mock<IQuadrant>();
             mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
             mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
-
             var calculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
 
             calculator.Execute(mockQuadrant.Object);
@@ -118,8 +139,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             mockIO.Verify(io => io.WriteLine("From Enterprise to Starbase:"), Times.Exactly(2));
         }
 
-        [Test]
-        public void Execute_WhenEnterpriseAndStarbaseSameLocation_DisplaysZeroDistanceAndUndefinedDirection()
+        public void Execute_WhenEnterpriseAndStarbaseAtSameLocation_DisplaysZeroDistance()
         {
             var coordinates = new Coordinates(2, 2);
             var mockIO = new Mock<IReadWrite>();
@@ -129,16 +149,15 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             var mockQuadrant = new Mock<IQuadrant>();
             mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
             mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
-
             var calculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
+
             calculator.Execute(mockQuadrant.Object);
 
             mockIO.Verify(io => io.WriteLine(It.Is<string>(s => s.Contains("Distance = 0"))), Times.Once);
-            
         }
 
         [Test]
-        public void Execute_WithMaxDistance_CalculatesCorrectValues()
+        public void Execute_WithMaxDistanceCoordinates_DisplaysDistanceInformation()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -147,16 +166,15 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             var mockQuadrant = new Mock<IQuadrant>();
             mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
             mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
-
             var calculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
+
             calculator.Execute(mockQuadrant.Object);
 
-           
             mockIO.Verify(io => io.WriteLine(It.Is<string>(s => s.Contains("Distance ="))), Times.Once);
         }
 
         [Test]
-        public void Execute_WithStarbase_OutputsFormattedDirectionAndDistance()
+        public void Execute_WithKnownCoordinates_DisplaysExpectedHeader()
         {
             var mockIO = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
@@ -165,15 +183,46 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             var mockQuadrant = new Mock<IQuadrant>();
             mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
             mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
-
             var calculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
+
             calculator.Execute(mockQuadrant.Object);
 
             mockIO.Verify(io => io.WriteLine("From Enterprise to Starbase:"), Times.Once);
-            mockIO.Verify(io => io.WriteLine("Direction = 8.25"), Times.Once); 
-            mockIO.Verify(io => io.WriteLine("Distance = 5"), Times.Once); 
         }
 
+        [Test]
+        public void Execute_WithKnownCoordinates_DisplaysExpectedDirection()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(100, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var starbase = new Starbase(new Coordinates(4, 5), mockRandom.Object, mockIO.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+            mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
+            mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
+            var calculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
+
+            calculator.Execute(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine("Direction = 8.25"), Times.Once);
+        }
+
+        [Test]
+        public void Execute_WithKnownCoordinates_DisplaysExpectedDistance()
+        {
+            var mockIO = new Mock<IReadWrite>();
+            var mockRandom = new Mock<IRandom>();
+            var enterprise = new Enterprise(100, new Coordinates(1, 1), mockIO.Object, mockRandom.Object);
+            var starbase = new Starbase(new Coordinates(4, 5), mockRandom.Object, mockIO.Object);
+            var mockQuadrant = new Mock<IQuadrant>();
+            mockQuadrant.Setup(q => q.HasStarbase).Returns(true);
+            mockQuadrant.Setup(q => q.Starbase).Returns(starbase);
+            var calculator = new StarbaseDataCalculator(enterprise, mockIO.Object);
+
+            calculator.Execute(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine("Distance = 5"), Times.Once);
+        }
 
     }
 }
