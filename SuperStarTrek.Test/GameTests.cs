@@ -1,13 +1,20 @@
 using System.Diagnostics;
+using System.Text;
 using SuperStarTrek.Resources;
 
 namespace SuperStarTrek.Test.Systems
 {
     public class GameTests
     {
-        public Process GameProcess()
+        Process? process;
+        StringBuilder? output;
+        StreamWriter? writer;
+        StreamReader? reader;
+
+        [SetUp]
+        public void GameProcess()
         {
-            var process = new Process
+            this.process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -20,24 +27,49 @@ namespace SuperStarTrek.Test.Systems
                 }
             };
 
-            return process;
+            this.output = new StringBuilder();
+            this.process.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                {
+                    this.output.AppendLine(args.Data);
+                }
+            };
+            this.process.ErrorDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                {
+                    TestContext.WriteLine(args.Data);
+                }
+            };
+
+            this.process.Start();
+            this.process.BeginOutputReadLine();
+            this.process.BeginErrorReadLine();
+            this.writer = this.process.StandardInput;
+            this.writer.AutoFlush = true;
+        }
+
+        [TearDown]
+        public void TearDown_Process()
+        {
+            this.process.Dispose();
+        }
+
+        public void RequestProcessShutdown()
+        {
+            this.writer.WriteLine("XXX");
+            this.writer.WriteLine("Nay");
+            this.writer.Close();
+            this.process.WaitForExit();
         }
 
         [Test]
         public void Game_PromptsTutorial_OnOpen()
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
-
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            RequestProcessShutdown();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains("Do you need instructions (Y/N)?"));
         }
@@ -45,18 +77,9 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Game_ShowsTutorial_IfAccepted()
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("Y");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
-
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            RequestProcessShutdown();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains(Strings.Instructions));
         }
@@ -64,18 +87,9 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Game_Title_Visible()
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
-
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            RequestProcessShutdown();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains(Strings.Title));
         }
@@ -91,21 +105,9 @@ namespace SuperStarTrek.Test.Systems
         [TestCase("Your orders are as follows")]
         public void Game_UIElements_ParametizedTest(string expected)
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
-            writer.Flush();
-            writer.WriteLine("XXX");
-            writer.Flush();
-            writer.WriteLine("Nay");
-            writer.Flush();
-            writer.Close();
-
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            RequestProcessShutdown();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
@@ -113,21 +115,13 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Game_NavCommand_CorrectVisual()
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
             writer.WriteLine("NAV");
             writer.WriteLine("1");
             writer.WriteLine("2");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
+            RequestProcessShutdown();
 
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains("Course (1-9)? Warp Factor (0-8)?"));
         }
@@ -135,20 +129,12 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Game_ShieldCommand_RaisesShields()
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
             writer.WriteLine("SHE");
             writer.WriteLine("10");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
+            RequestProcessShutdown();
 
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains("Shields now at 10 units per your command."));
         }
@@ -156,18 +142,11 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Game_DamageReport_ShowCasesDamageInfo()
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
             writer.WriteLine("DAM");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
+            RequestProcessShutdown();
 
-            string output = reader.ReadToEnd();
+            string output = this.output.ToString();
             string expected = @"Device             State of Repair
 Warp Engines              0 
 Short Range Sensors       0 
@@ -177,7 +156,6 @@ Photon Tubes              0
 Shield Control            0 
 Damage Control            0 
 Library-Computer          0";
-            process.WaitForExit();
             TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
@@ -185,20 +163,12 @@ Library-Computer          0";
         [Test]
         public void Game_ComputerCommand_RequestsOption()
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
             writer.WriteLine("COM");
             writer.WriteLine("10");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
+            RequestProcessShutdown();
 
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains("Computer active and waiting command?"));
         }
@@ -213,20 +183,12 @@ Library-Computer          0";
         [TestCase("5 = Galaxy 'region name' map")]
         public void Game_ComputerCommand_WrongInputShowsOptions(string expected)
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
             writer.WriteLine("COM");
             writer.WriteLine("10");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
+            RequestProcessShutdown();
 
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
@@ -236,20 +198,12 @@ Library-Computer          0";
         [TestCase("Torpedo track:")]
         public void Game_TorpedoCommand(string expected)
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
             writer.WriteLine("TOR");
             writer.WriteLine("1");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
+            RequestProcessShutdown();
 
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
@@ -266,19 +220,11 @@ Library-Computer          0";
         [TestCase("XXX  (To resign your command)")]
         public void Game_HelpCommand_PrintsAvailableCommands(string expected)
         {
-            var process = GameProcess();
-            process.Start();
-            var writer = process.StandardInput;
-            var reader = process.StandardOutput;
-
             writer.WriteLine("N");
             writer.WriteLine("?");
-            writer.WriteLine("XXX");
-            writer.WriteLine("Nay");
-            writer.Close();
+            RequestProcessShutdown();
 
-            string output = reader.ReadToEnd();
-            process.WaitForExit();
+            string output = this.output.ToString();
             TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
