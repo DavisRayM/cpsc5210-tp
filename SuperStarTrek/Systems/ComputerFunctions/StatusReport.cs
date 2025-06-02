@@ -7,9 +7,9 @@ namespace SuperStarTrek.Systems.ComputerFunctions;
 
 internal class StatusReport : ComputerFunction
 {
-    private readonly Game _game;
-    private readonly Galaxy _galaxy;
-    private readonly Enterprise _enterprise;
+    internal readonly Game _game;
+    internal readonly Galaxy _galaxy;
+    internal readonly Enterprise _enterprise;
 
     internal StatusReport(Game game, Galaxy galaxy, Enterprise enterprise, IReadWrite io)
         : base("Status report", io)

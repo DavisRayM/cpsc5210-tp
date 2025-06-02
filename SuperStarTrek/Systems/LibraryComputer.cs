@@ -7,8 +7,8 @@ namespace SuperStarTrek.Systems;
 
 internal class LibraryComputer : Subsystem
 {
-    private readonly IReadWrite _io;
-    private readonly ComputerFunction[] _functions;
+    internal readonly IReadWrite _io;
+    internal readonly ComputerFunction[] _functions;
 
     internal LibraryComputer(IReadWrite io, params ComputerFunction[] functions)
         : base("Library-Computer", Command.COM, io)
