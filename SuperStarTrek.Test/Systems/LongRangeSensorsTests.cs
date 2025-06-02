@@ -9,34 +9,65 @@ namespace SuperStarTrek.Test.Systems
 {
     public class LongRangeSensorsTests
     {
+        IOSpy _ioSpy;
+        Mock<Galaxy> _galaxyMock;
+        Mock<IQuadrant> _quadrantMock;
+        LongRangeSensors _testLongRangeSensors;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _ioSpy = new();
+
+            _galaxyMock = new(new Mock<IRandom>().Object);
+
+            _quadrantMock = new();
+            _quadrantMock
+                .Setup(quadrant => quadrant.Coordinates)
+                .Returns(new Coordinates(0, 0));
+
+            _testLongRangeSensors = new(
+                _galaxyMock.Object,
+                _ioSpy
+            );
+        }
+
         #region CanExecuteCommand
 
         [Test]
-        public void CanExecuteCommand_IsDamaged_True_Should_WriteToIO_And_ReturnFalse()
+        public void CanExecuteCommand_IsDamaged_True_Should_ReturnFalse()
         {
-            Mock<IReadWrite> ioMock = new();
+            _testLongRangeSensors.TakeDamage(0.0000000001f);
 
-            LongRangeSensors testLongRangeSensors = new(
-                new Mock<Galaxy>(new Mock<IRandom>().Object).Object,
-                ioMock.Object
-            );
-            
-            testLongRangeSensors.TakeDamage(0.0000000001f);
+            Assert.That(_testLongRangeSensors.CanExecuteCommand(), Is.EqualTo(false));
+        }
 
-            Assert.That(testLongRangeSensors.CanExecuteCommand(), Is.EqualTo(false));
+        [Test]
+        public void CanExecuteCommand_IsDamaged_True_Should_WriteToIO()
+        {
+            _testLongRangeSensors.TakeDamage(0.0000000001f);
 
-            ioMock.Verify(io => io.WriteLine("Long Range Sensors are inoperable"), Times.Once);
+            _testLongRangeSensors.CanExecuteCommand();
+
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "Long Range Sensors are inoperable",
+                ""
+            ])));
         }
 
         [Test]
         public void CanExecuteCommand_IsDamaged_False_Should_ReturnFalse()
         {
-            LongRangeSensors testLongRangeSensors = new(
-                new Mock<Galaxy>(new Mock<IRandom>().Object).Object,
-                new Mock<IReadWrite>().Object
-            );
-            
-            Assert.That(testLongRangeSensors.CanExecuteCommand(), Is.EqualTo(true));
+            Assert.That(_testLongRangeSensors.CanExecuteCommand(), Is.EqualTo(true));
+        }
+
+        [Test]
+        public void CanExecuteCommand_IsDamaged_False_Should_Not_WriteToIO()
+        {
+            _testLongRangeSensors.CanExecuteCommand();
+
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(""));
         }
 
         #endregion CanExecuteCommand
@@ -44,10 +75,9 @@ namespace SuperStarTrek.Test.Systems
         #region ExecuteCommandCore
 
         [Test]
-        public void ExecuteCommandCore_Should_PrintAllScans()
+        public void ExecuteCommandCore_Should_Return_OK()
         {
-            Mock<Galaxy> galaxyMock = new(new Mock<IRandom>().Object);
-            List<IEnumerable<QuadrantInfo?>> neighbors =
+            List<IEnumerable<QuadrantInfo?>>  neighbors =
             [
                 [ 
                     null, 
@@ -65,56 +95,81 @@ namespace SuperStarTrek.Test.Systems
                     null 
                 ],
             ];
-            galaxyMock
+            _galaxyMock
                 .Setup(galaxy => galaxy.GetNeighborhood(It.IsAny<IQuadrant>()))
                 .Returns(neighbors);
 
-            Mock<IReadWrite> ioMock = new();
+            Assert.That(_testLongRangeSensors.ExecuteCommandCore(_quadrantMock.Object), Is.EqualTo(CommandResult.Ok));
+        }
 
-            LongRangeSensors testLongRangeSensors = new(
-                galaxyMock.Object,
-                ioMock.Object
-            );
+        [Test]
+        public void ExecuteCommandCore_Should_PrintAllScans()
+        {
+            List<IEnumerable<QuadrantInfo?>>  neighbors =
+            [
+                [ 
+                    null, 
+                    new QuadrantInfo(new Coordinates(1, 1), "Quadrant1", 1, 1, false), 
+                    new QuadrantInfo(new Coordinates(2, 2), "Quadrant2", 2, 2, true), 
+                ],
+                [
+                    new QuadrantInfo(new Coordinates(3, 3), "Quadrant3", 3, 3, true),
+                    new QuadrantInfo(new Coordinates(4, 4), "Quadrant4", 4, 4, false),
+                    null
+                ],
+                [
+                    new QuadrantInfo(new Coordinates(6, 6), "Quadrant6", 6, 6, true),
+                    null, 
+                    null 
+                ],
+            ];
+            _galaxyMock
+                .Setup(galaxy => galaxy.GetNeighborhood(It.IsAny<IQuadrant>()))
+                .Returns(neighbors);
 
-            Mock<IQuadrant> quadrantMock = new();
-            quadrantMock
-                .Setup(quadrant => quadrant.Coordinates)
-                .Returns(new Coordinates(0, 0));
+            _testLongRangeSensors.ExecuteCommandCore(_quadrantMock.Object);
 
-            Assert.That(testLongRangeSensors.ExecuteCommandCore(quadrantMock.Object), Is.EqualTo(CommandResult.Ok));
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "Long range scan for quadrant 1 , 1",
+                "-------------------",
+                ": *** : 101 : 212 :",
+                "-------------------",
+                ": 313 : 404 : *** :",
+                "-------------------",
+                ": 616 : *** : *** :",
+                "-------------------",
+                ""
+            ])));
+        }
 
-            ioMock.Verify(io => io.WriteLine("Long range scan for quadrant 1 , 1"), Times.Once);
-            ioMock.Verify(io => io.WriteLine("-------------------"), Times.Exactly(4));
-            ioMock.Verify(io => io.WriteLine(": *** : 101 : 212 :"), Times.Once);
-            ioMock.Verify(io => io.WriteLine(": 313 : 404 : *** :"), Times.Once);
-            ioMock.Verify(io => io.WriteLine(": 616 : *** : *** :"), Times.Once);
+        [Test]
+        public void ExecuteCommandCore_NoNeighbors_Should_Return_OK()
+        {
+            List<IEnumerable<QuadrantInfo?>> neighbors = [];
+            _galaxyMock
+                .Setup(galaxy => galaxy.GetNeighborhood(It.IsAny<IQuadrant>()))
+                .Returns(neighbors);
+
+            Assert.That(_testLongRangeSensors.ExecuteCommandCore(_quadrantMock.Object), Is.EqualTo(CommandResult.Ok));
         }
 
         [Test]
         public void ExecuteCommandCore_NoNeighbors_Should_PrintTwoLines()
         {
-            Mock<Galaxy> galaxyMock = new(new Mock<IRandom>().Object);
             List<IEnumerable<QuadrantInfo?>> neighbors = [];
-            galaxyMock
+            _galaxyMock
                 .Setup(galaxy => galaxy.GetNeighborhood(It.IsAny<IQuadrant>()))
                 .Returns(neighbors);
 
-            Mock<IReadWrite> ioMock = new();
+            _testLongRangeSensors.ExecuteCommandCore(_quadrantMock.Object);
 
-            LongRangeSensors testLongRangeSensors = new(
-                galaxyMock.Object,
-                ioMock.Object
-            );
-
-            Mock<IQuadrant> quadrantMock = new();
-            quadrantMock
-                .Setup(quadrant => quadrant.Coordinates)
-                .Returns(new Coordinates(0, 0));
-
-            Assert.That(testLongRangeSensors.ExecuteCommandCore(quadrantMock.Object), Is.EqualTo(CommandResult.Ok));
-
-            ioMock.Verify(io => io.WriteLine("Long range scan for quadrant 1 , 1"), Times.Once);
-            ioMock.Verify(io => io.WriteLine("-------------------"), Times.Once);
+            Assert.That(_ioSpy.GetOutput(), Is.EqualTo(string.Join(Environment.NewLine,
+            [
+                "Long range scan for quadrant 1 , 1",
+                "-------------------",
+                ""
+            ])));
         }
 
         #endregion ExecuteCommandCore

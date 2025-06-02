@@ -38,12 +38,46 @@ namespace SuperStarTrek.Test.Systems
             );
         }
 
+        #region Constructor
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Name()
+        {
+            Assert.That(_testLibraryComputer.Name, Is.EqualTo("Library-Computer"));
+        }
+        
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Command()
+        {
+            Assert.That(_testLibraryComputer.Command, Is.EqualTo(Command.COM));
+        }
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Condition()
+        {
+            Assert.That(_testLibraryComputer.Condition, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_IO()
+        {
+            Assert.That(_testLibraryComputer._io, Is.EqualTo(_ioMock.Object));
+        }
+
+        [Test]
+        public void LibraryComputer_Constructor_CorrectlySets_Functions()
+        {
+            Assert.That(_testLibraryComputer._functions, Is.EqualTo(_computerFunctionMocks));
+        }
+
+        #endregion Constructor
+
         #region CanExecuteCommand
 
         [Test]
         public void CanExecuteCommand_Damaged_ShouldReturnFalse()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(2);
 
             _testLibraryComputer.TakeDamage(1);
 
@@ -53,7 +87,7 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void CanExecuteCommand_Damaged_Should_Print_Disabled()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(2);
 
             _testLibraryComputer.TakeDamage(1);
 
@@ -66,7 +100,7 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void CanExecuteCommand_NotDamaged_ShouldReturnTrue()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(2);
 
             Assert.That(_testLibraryComputer.CanExecuteCommand(), Is.EqualTo(true));
         }
@@ -74,7 +108,7 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void CanExecuteCommand_NotDamaged_Should_Print_Disabled()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(2);
 
             _ioMock.Verify(io => io.WriteLine("Computer disabled"), Times.Never);
         }
@@ -86,7 +120,7 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Valid_ExecuteCommandCore_Returns_Ok()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(0);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(0);
 
             Mock<IQuadrant> quadrantMock = new();
 
@@ -99,7 +133,7 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Valid_ExecuteCommandCore_Prints_EmptyString()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(0);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(0);
 
             Mock<IQuadrant> quadrantMock = new();
 
@@ -111,7 +145,7 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Valid_ExecuteCommandCore_Executes_ComputerFunction()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(0);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(0);
 
             Mock<IReadWrite> ioMockForComputerFunction = new();
 
@@ -142,16 +176,16 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Valid_GetFunctionIndex_Returns_Correct_Index()
         {
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(2);
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(5);
 
-            Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
+            Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(5));
         }
 
         [Test]
         public void GetFunctionIndex_NegativeIndex_Returns_Correct_Index()
         {
             Queue<float> indices = new([-1f, 2f]);
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(() => indices.Dequeue());
 
             Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
         }
@@ -160,7 +194,7 @@ namespace SuperStarTrek.Test.Systems
         public void GetFunctionIndex_NegativeIndex_Displays_ComputerFunctions()
         {
             Queue<float> indices = new([-1f, 2f]);
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(() => indices.Dequeue());
 
             _testLibraryComputer.GetFunctionIndex();
 
@@ -177,7 +211,7 @@ namespace SuperStarTrek.Test.Systems
         public void GetFunctionIndex_TooLargeIndex_Returns_Correct_Index()
         {
             Queue<float> indices = new([1000f, 2f]);
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(() => indices.Dequeue());
 
             Assert.That(_testLibraryComputer.GetFunctionIndex(), Is.EqualTo(2));
         }
@@ -186,7 +220,7 @@ namespace SuperStarTrek.Test.Systems
         public void GetFunctionIndex_TooLargeIndex_Displays_ComputerFunctions()
         {
             Queue<float> indices = new([1000f, 2f]);
-            _ioMock.Setup(io => io.ReadNumber(It.IsAny<string>())).Returns(() => indices.Dequeue());
+            _ioMock.Setup(io => io.ReadNumber("Computer active and waiting command")).Returns(() => indices.Dequeue());
 
             _testLibraryComputer.GetFunctionIndex();
 
