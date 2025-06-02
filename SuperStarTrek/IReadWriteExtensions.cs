@@ -11,8 +11,10 @@ internal static class IReadWriteExtensions
 {
     internal static void WaitForAnyKeyButEnter(this IReadWrite io, string prompt)
     {
+#if !DISABLE_KEY_WAIT // During UI Tests this becomes a blocker
         io.Write($"Hit any key but Enter {prompt} ");
-        while (io.ReadCharacter() == '\r');
+        while (io.ReadCharacter() == '\r') ;
+#endif
     }
 
     internal static (float X, float Y) GetCoordinates(this IReadWrite io, string prompt) =>
@@ -35,7 +37,7 @@ internal static class IReadWriteExtensions
 
     internal static Command ReadCommand(this IReadWrite io)
     {
-        while(true)
+        while (true)
         {
             var response = io.ReadString("Command");
 
