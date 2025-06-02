@@ -36,6 +36,11 @@ jobs:
           -targetdir:"coverage-report" \
           -reporttypes:"HtmlInline_AzurePipelines;TextSummary"
 
+    - name: Run Mutation tests
+      run: |
+          dotnet tool install -g dotnet-stryker
+          dotnet stryker -O results
+
     - name: Email Test Results
       uses: dawidd6/action-send-mail@v5
       if: always()
@@ -45,8 +50,8 @@ jobs:
         secure: false
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
-        subject: Team Project Test Results
-        to: dmuro@seattleu.edu,ksullivan@seattleu.edu,tlo@seattleu.edu
+        subject: Team Project Test Results - branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+        to: dmuro@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
         # Optional HTML body read from file:
@@ -61,9 +66,25 @@ jobs:
         secure: false
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
-        subject: Team Project Coverage Results
-        to: dmuro@seattleu.edu,ksullivan@seattleu.edu,tlo@seattleu.edu
+        subject: Team Project Coverage Results - branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+        to: dmuro@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
         # Optional HTML body read from file:
         html_body: file://coverage-report/index.html
+
+    - name: Email Mutation Results
+      uses: dawidd6/action-send-mail@v5
+      if: always()
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        secure: false
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        subject: Team Project Mutation Results - branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+        to: dmuro@seattleu.edu
+        from: CPSC 5210 Team Project
+        body: Build job of ${{github.repository}} completed successfully!
+        # Optional HTML body read from file:
+        html_body: file://results/reports/mutation-report.html
