@@ -279,7 +279,6 @@ Library-Computer          0";
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            TestContext.WriteLine("-------");
             TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }

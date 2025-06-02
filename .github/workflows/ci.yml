@@ -24,7 +24,9 @@ jobs:
       run: dotnet build --configuration Debug
 
     - name: Build UI Test Binary
-      run: dotnet build SuperStarTrek/SuperStarTrek.csproj -c TestDebug -p:DefineConstants="DISABLE_KEY_WAIT" -o SuperStarTrek.Test/bin/Debug/
+      run: |
+        dotnet build SuperStarTrek/SuperStarTrek.csproj -c TestDebug -p:DefineConstants="DISABLE_KEY_WAIT" -o SuperStarTrek.Test/bin/Debug/
+        chmod +x SuperStarTrek.Test/bin/Debug/SuperStarTrek
 
     - name: Run Tests
       run: |
