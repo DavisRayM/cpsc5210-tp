@@ -18,7 +18,7 @@ internal abstract class Subsystem
 
     internal string Name { get; }
 
-    internal float Condition { get; private set; }
+    internal virtual float Condition { get; private set; }
 
     internal bool IsDamaged => Condition < 0;
 

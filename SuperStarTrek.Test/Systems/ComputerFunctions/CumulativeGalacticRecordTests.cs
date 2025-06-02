@@ -21,6 +21,18 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
     public class CumulativeGalacticRecordTests
     {
         [Test]
+        public void System_Description_IsExpected()
+        {
+            Mock<IReadWrite> mockIO = new();
+            Mock<Galaxy> mockGalaxy = new(new Mock<IRandom>().Object);
+            Mock<IQuadrant> mockQuadrant = new();
+            Coordinates expectedCoords = new(1, 5);
+
+            TestableCumulativeGalacticRecord record = new(mockIO.Object, mockGalaxy.Object);
+            Assert.That(record.Description, Is.EqualTo("Cumulative galactic record"));
+        }
+
+        [Test]
         public void WriteHeader_Record_WritesToIO()
         {
             Mock<IReadWrite> mockIO = new();
@@ -34,8 +46,24 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
 
             record.CallWriteHeader(mockQuadrant.Object);
 
-            mockIO.Verify(io => io.WriteLine(""), Times.Exactly(2));
             mockIO.Verify(io => io.WriteLine($"Computer record of galaxy for quadrant {expectedCoords}"), Times.Once());
+        }
+
+        [Test]
+        public void WriteHeader_Record_PrintsSpace()
+        {
+            Mock<IReadWrite> mockIO = new();
+            Mock<Galaxy> mockGalaxy = new(new Mock<IRandom>().Object);
+            Mock<IQuadrant> mockQuadrant = new();
+            Coordinates expectedCoords = new(1, 5);
+
+            TestableCumulativeGalacticRecord record = new(mockIO.Object, mockGalaxy.Object);
+            mockQuadrant.Setup(q => q.Coordinates)
+                .Returns(expectedCoords);
+
+            record.CallWriteHeader(mockQuadrant.Object);
+
+            mockIO.Verify(io => io.WriteLine(""), Times.Exactly(2));
         }
 
         [Test]
