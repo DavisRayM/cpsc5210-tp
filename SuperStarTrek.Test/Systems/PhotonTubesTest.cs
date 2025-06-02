@@ -981,7 +981,6 @@ namespace SuperStarTrek.Test.Systems
             mockIO.Verify(io => io.WriteLine("Torpedo track:"), Times.Once);
         }
 
-        // TODO: Candidate for IOSpy
         [Test]
         public void ExecuteCommandCore_TorpedoTravelsMultipleSectors_PrintsAllSectorPositions()
         {
