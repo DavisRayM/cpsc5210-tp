@@ -38,7 +38,7 @@ namespace SuperStarTrek.Test.Systems
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains("Do you need instructions (Y/N)?"));
         }
 
@@ -57,7 +57,7 @@ namespace SuperStarTrek.Test.Systems
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains(Strings.Instructions));
         }
 
@@ -76,7 +76,7 @@ namespace SuperStarTrek.Test.Systems
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains(Strings.Title));
         }
 
@@ -106,7 +106,7 @@ namespace SuperStarTrek.Test.Systems
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
 
@@ -128,7 +128,7 @@ namespace SuperStarTrek.Test.Systems
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains("Course (1-9)? Warp Factor (0-8)?"));
         }
 
@@ -149,7 +149,7 @@ namespace SuperStarTrek.Test.Systems
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains("Shields now at 10 units per your command."));
         }
 
@@ -178,7 +178,7 @@ Shield Control            0
 Damage Control            0 
 Library-Computer          0";
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
 
@@ -199,7 +199,7 @@ Library-Computer          0";
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains("Computer active and waiting command?"));
         }
 
@@ -227,7 +227,7 @@ Library-Computer          0";
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
 
@@ -250,7 +250,7 @@ Library-Computer          0";
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
 
@@ -279,7 +279,8 @@ Library-Computer          0";
 
             string output = reader.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine(output);
+            TestContext.WriteLine("-------");
+            TestContext.WriteLine(output);
             Assert.True(output.Contains(expected));
         }
     }
