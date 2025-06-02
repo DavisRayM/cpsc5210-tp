@@ -64,13 +64,20 @@ namespace SuperStarTrek.Test.Systems
             this.process.WaitForExit();
         }
 
+        public void printOutput()
+        {
+            TestContext.WriteLine($"Test Title: {TestContext.CurrentContext.Test.Name}");
+            TestContext.WriteLine(this.output);
+            TestContext.WriteLine("====================================================");
+        }
+
         [Test]
         public void Game_PromptsTutorial_OnOpen()
         {
             writer.WriteLine("N");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains("Do you need instructions (Y/N)?"));
         }
 
@@ -80,7 +87,7 @@ namespace SuperStarTrek.Test.Systems
             writer.WriteLine("Y");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains(Strings.Instructions));
         }
 
@@ -90,7 +97,7 @@ namespace SuperStarTrek.Test.Systems
             writer.WriteLine("N");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains(Strings.Title));
         }
 
@@ -108,7 +115,7 @@ namespace SuperStarTrek.Test.Systems
             writer.WriteLine("N");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -122,7 +129,7 @@ namespace SuperStarTrek.Test.Systems
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains("Course (1-9)? Warp Factor (0-8)?"));
         }
 
@@ -135,7 +142,7 @@ namespace SuperStarTrek.Test.Systems
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains("Shields now at 10 units per your command."));
         }
 
@@ -156,7 +163,7 @@ Photon Tubes              0
 Shield Control            0 
 Damage Control            0 
 Library-Computer          0";
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -169,7 +176,7 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains("Computer active and waiting command?"));
         }
 
@@ -189,7 +196,7 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -204,7 +211,7 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -225,7 +232,7 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            TestContext.WriteLine(output);
+            printOutput();
             Assert.True(output.Contains(expected));
         }
     }
