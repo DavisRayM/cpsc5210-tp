@@ -140,10 +140,24 @@ namespace SuperStarTrek.Test.Space
                 .Returns(0f);
 
             var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
-            Assert.False(quadrantInfo.HasStarbase, "Initially created quadrantInfo already has starbase");
-
             quadrantInfo.AddStarbase();
             Assert.True(quadrantInfo.HasStarbase);
+        }
+
+        /**
+         * Test that `QuadrantInfo` has the `HasStarbase` flag set to false.
+         */
+        [Test]
+        public void AddStarbase_WithQuadrantInfoWithoutStarbase_HasStarBaseFalse()
+        {
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+
+            var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
+            Assert.False(quadrantInfo.HasStarbase);
         }
 
         /**
@@ -160,9 +174,25 @@ namespace SuperStarTrek.Test.Space
 
             var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
 
-            Assert.That(quadrantInfo.ToString(), Is.EqualTo("***"));
             quadrantInfo.MarkAsKnown();
             Assert.That(quadrantInfo.ToString(), Is.EqualTo("001"));
+        }
+
+        /**
+         * Test `ToString` when Quadrant is unknown
+         */
+        [Test]
+        public void QuadrantInfo_ToString_Unknown()
+        {
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+
+            var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
+
+            Assert.That(quadrantInfo.ToString(), Is.EqualTo("***"));
         }
 
         /**
@@ -238,8 +268,6 @@ namespace SuperStarTrek.Test.Space
                 .Returns(0f);
 
             var quadrantInfo = QuadrantInfo.Create(Coords, Name, mockRandom.Object);
-
-            Assert.That(initial, Is.EqualTo(quadrantInfo.KlingonCount));
             quadrantInfo.RemoveKlingon();
 
             return quadrantInfo.KlingonCount;

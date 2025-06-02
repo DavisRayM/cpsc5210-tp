@@ -45,8 +45,8 @@ jobs:
         secure: false
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
-        subject: Team Project Test Results
-        to: dmuro@seattleu.edu,ksullivan@seattleu.edu,tlo@seattleu.edu
+        subject: "Team Project Test Results - branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+        to: dmuro@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
         # Optional HTML body read from file:
@@ -61,8 +61,8 @@ jobs:
         secure: false
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
-        subject: Team Project Coverage Results
-        to: dmuro@seattleu.edu,ksullivan@seattleu.edu,tlo@seattleu.edu
+        subject: "Team Project Coverage Results - branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+        to: dmuro@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
         # Optional HTML body read from file:
