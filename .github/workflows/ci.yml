@@ -23,6 +23,11 @@ jobs:
     - name: Build solution
       run: dotnet build --configuration Debug
 
+    - name: Build UI Test Binary
+      run: |
+        dotnet build SuperStarTrek/SuperStarTrek.csproj -c TestDebug -p:DefineConstants="DISABLE_KEY_WAIT" -o SuperStarTrek.Test/bin/Debug/
+        chmod +x SuperStarTrek.Test/bin/Debug/SuperStarTrek
+
     - name: Run Tests
       run: |
         mkdir results
@@ -45,7 +50,7 @@ jobs:
         secure: false
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
-        subject: "Team Project Test Results - branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+        subject: "Team Project Test Results - branch=${{ github.ref_name }}"
         to: dmuro@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
@@ -61,7 +66,7 @@ jobs:
         secure: false
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
-        subject: "Team Project Coverage Results - branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+        subject: "Team Project Coverage Results - branch=${{ github.ref_name }}"
         to: dmuro@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
