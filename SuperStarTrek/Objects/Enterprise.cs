@@ -32,9 +32,9 @@ internal class Enterprise
 
     internal Quadrant Quadrant => _quadrant;
 
-    internal Coordinates QuadrantCoordinates => _quadrant.Coordinates;
+    internal virtual Coordinates QuadrantCoordinates => _quadrant.Coordinates;
 
-    internal Coordinates SectorCoordinates { get; private set; }
+    internal virtual Coordinates SectorCoordinates { get; private set; }
 
     internal string Condition => GetCondition();
 
