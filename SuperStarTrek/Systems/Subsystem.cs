@@ -37,7 +37,7 @@ internal abstract class Subsystem
         return true;
     }
 
-    internal CommandResult ExecuteCommand(Quadrant quadrant)
+    internal CommandResult ExecuteCommand(IQuadrant quadrant)
         => CanExecuteCommand() ? ExecuteCommandCore(quadrant) : CommandResult.Ok;
 
     internal abstract CommandResult ExecuteCommandCore(IQuadrant quadrant);

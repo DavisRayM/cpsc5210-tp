@@ -1,4 +1,5 @@
 ﻿using Games.Common.IO;
+using Moq;
 using SuperStarTrek.Commands;
 using SuperStarTrek.Space;
 using SuperStarTrek.Systems;
@@ -11,9 +12,21 @@ namespace SuperStarTrek.Test.Systems
         internal class SubsystemTestable(string name, Command command, IReadWrite io)
             : Subsystem(name, command, io)
         {
+            public bool _returnValueForCanExecuteCommand;
+            public bool _ExecuteCommandCoreCalled = false;
+            public IQuadrant? _quadrantCaptured;
+
+            internal override bool CanExecuteCommand()
+            {
+                return _returnValueForCanExecuteCommand;
+            }
+
             internal override CommandResult ExecuteCommandCore(IQuadrant quadrant)
             {
-                return CommandResult.Ok;
+                _ExecuteCommandCoreCalled = true;
+                _quadrantCaptured = quadrant;
+                
+                return CommandResult.GameOver;
             }
         }
 
@@ -26,7 +39,49 @@ namespace SuperStarTrek.Test.Systems
             _ioSpy = new();
             testSubsystem = new("", Command.XXX, _ioSpy);
         }
-        
+
+        #region ExecuteCommand
+
+        [Test]
+        public void Subsystem_ExecuteCommand_When_CanExecuteCommand_IsFalse_Should_Return_OK()
+        {
+            testSubsystem._returnValueForCanExecuteCommand = false;
+            Mock<IQuadrant> quadrantMock = new();
+            Assert.That(testSubsystem.ExecuteCommand(quadrantMock.Object),
+                        Is.EqualTo(CommandResult.Ok)); 
+        }
+
+        [Test]
+        public void Subsystem_ExecuteCommand_When_CanExecuteCommand_IsFalse_Should_Not_Call_ExecuteCommmandCore()
+        {
+            testSubsystem._returnValueForCanExecuteCommand = false;
+            Mock<IQuadrant> quadrantMock = new();
+            testSubsystem.ExecuteCommand(quadrantMock.Object);
+            Assert.That(testSubsystem._ExecuteCommandCoreCalled, Is.False); 
+        }
+
+        [Test]
+        public void Subsystem_ExecuteCommand_When_CanExecuteCommand_IsTrue_Should_Call_ExecuteCommmandCore()
+        {
+            testSubsystem._returnValueForCanExecuteCommand = true;
+            Mock<IQuadrant> quadrantMock = new();
+            testSubsystem.ExecuteCommand(quadrantMock.Object);
+            Assert.That(testSubsystem._ExecuteCommandCoreCalled); 
+        }
+
+        [Test]
+        public void Subsystem_ExecuteCommand_When_CanExecuteCommand_IsTrue_Should_Send_Quadrant_To_ExecuteCommmandCore()
+        {
+            testSubsystem._returnValueForCanExecuteCommand = true;
+            Mock<IQuadrant> quadrantMock = new();
+            testSubsystem.ExecuteCommand(quadrantMock.Object);
+            Assert.That(testSubsystem._quadrantCaptured, Is.EqualTo(quadrantMock.Object)); 
+        }
+
+        #endregion ExecuteCommand
+
+        #region Repair
+
         [Test]
         [TestCase(0.1f, 0.05f, ExpectedResult = -0.1f)]
         [TestCase(1f, 0.5f, ExpectedResult = -0.5f)]
@@ -55,5 +110,7 @@ namespace SuperStarTrek.Test.Systems
             testSubsystem.TakeDamage(damage);
             return testSubsystem.Repair(repairWorkDone);
         }
+
+        #endregion Repair
     }
 }
