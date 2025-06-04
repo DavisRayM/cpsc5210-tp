@@ -28,7 +28,7 @@ internal class Game
         _random = random;
     }
 
-    internal float Stardate => _currentStardate;
+    internal virtual float Stardate => _currentStardate;
 
     internal virtual float StardatesRemaining => _finalStarDate - _currentStardate;
 

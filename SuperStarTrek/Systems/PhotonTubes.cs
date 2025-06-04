@@ -19,7 +19,7 @@ internal class PhotonTubes : Subsystem
         _io = io;
     }
 
-    internal int TorpedoCount { get;  set; }
+    internal virtual int TorpedoCount { get;  set; }
 
     internal override bool CanExecuteCommand() => HasTorpedoes() && IsOperational("{name} are not operational");
 
