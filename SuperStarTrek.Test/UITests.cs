@@ -110,6 +110,7 @@ namespace SuperStarTrek.Test.Systems
         [TestCase("Your orders are as follows")]
         public void Game_UIElements_ParametizedTest(string expected)
         {
+            printOutput();
             writer.WriteLine("N");
             RequestProcessShutdown();
             string output = this.output.ToString();
@@ -119,6 +120,7 @@ namespace SuperStarTrek.Test.Systems
         [Test]
         public void Game_NavCommand_CorrectVisual()
         {
+            printOutput();
             writer.WriteLine("N");
             writer.WriteLine("NAV");
             writer.WriteLine("1");

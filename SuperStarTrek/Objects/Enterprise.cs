@@ -95,7 +95,7 @@ internal class Enterprise
         TotalEnergy -= amountUsed;
     }
 
-    internal CommandResult TakeHit(Coordinates sector, int hitStrength)
+    internal virtual CommandResult TakeHit(Coordinates sector, int hitStrength)
     {
         _io.WriteLine($"{hitStrength} unit hit on Enterprise from sector {sector}");
         ShieldControl.AbsorbHit(hitStrength);

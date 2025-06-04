@@ -19,11 +19,11 @@ internal class QuadrantInfo
 
     internal string Name { get; }
 
-    internal int KlingonCount { get; private set; }
+    internal virtual int KlingonCount { get; private set; }
 
-    internal bool HasStarbase { get; private set; }
+    internal virtual bool HasStarbase { get; private set; }
 
-    internal int StarCount { get; }
+    internal virtual int StarCount { get; }
 
     internal static QuadrantInfo Create(Coordinates coordinates, string name, IRandom random)
     {
@@ -54,7 +54,7 @@ internal class QuadrantInfo
 
     public override string ToString() => _isKnown ? $"{KlingonCount}{(HasStarbase ? 1 : 0)}{StarCount}" : "***";
 
-    internal void RemoveKlingon()
+    internal virtual void RemoveKlingon()
     {
         if (KlingonCount > 0)
         {
@@ -62,5 +62,5 @@ internal class QuadrantInfo
         }
     }
 
-    internal void RemoveStarbase() => HasStarbase = false;
+    internal virtual void RemoveStarbase() => HasStarbase = false;
 }
