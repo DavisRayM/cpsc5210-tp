@@ -44,7 +44,7 @@ internal class QuadrantInfo
 
     internal void AddStarbase() => HasStarbase = true;
 
-    internal void MarkAsKnown() => _isKnown = true;
+    internal virtual void MarkAsKnown() => _isKnown = true;
 
     internal string Scan()
     {

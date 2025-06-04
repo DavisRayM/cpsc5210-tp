@@ -278,6 +278,34 @@ namespace SuperStarTrek.Space
             mockInfo.Verify(i => i.RemoveKlingon(), Times.Once());
         }
 
+        // Test: Constructor marks the quadrant info as known
+        [Test]
+        public void Constructor_QuadrantInfo_MarkedKnown()
+        {
+            var mockRandom = new Mock<IRandom>();
+            Mock<QuadrantInfo> mockInfo = new(new Coordinates(0, 0), "Test-Quadrant", 1, 1, false);
+            mockInfo.Setup(i => i.KlingonCount).Returns(1);
+
+            var mockRandomGalaxy = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+            var galaxy = new Galaxy(mockRandomGalaxy.Object);
+            var randomMock = new Mock<IRandom>();
+            var ioMock = new Mock<IReadWrite>();
+            var enterprise = new Enterprise(0, new Coordinates(1, 1), ioMock.Object, randomMock.Object);
+            randomMock.SetupSequence(r => r.NextFloat())
+                .Returns(0.5f)
+                .Returns(0f)
+                .Returns(0.9f)
+                .Returns(0.4f);
+            var coordinates = new Coordinates((int)(0.5 * 7.98 + 1.01) - 1, (int)(0 * 7.98 + 1.01) - 1);
+
+            var quadrant = new Quadrant(mockInfo.Object, enterprise, randomMock.Object, galaxy, ioMock.Object);
+            mockInfo.Verify(i => i.MarkAsKnown(), Times.Once());
+        }
+
         // Test: TorpedoCollisionAt should remove klingon from sector if hit.
         [Test]
         public void TorpedoCollisonAt_WhenHittingKlingon_RemovesKlingonFromSector()
@@ -1002,11 +1030,43 @@ namespace SuperStarTrek.Space
             randomMock.SetupSequence(r => r.NextFloat())
                 .Returns(0.3f)
                 .Returns(0f);
-            var klingonCoords = new Coordinates((int)(0.3 * 7.98 + 1.01) - 1, (int)(0.2 * 7.98 + 1.01) - 1);
+            var klingonCoords = new Coordinates(2, 0);
 
             var quadrant = new Quadrant(mockInfo.Object, mockEnterprise.Object, randomMock.Object, mockGalaxy.Object, ioMock.Object);
             quadrant.KlingonsMoveAndFire();
             Assert.False(quadrant.HasObjectAt(klingonCoords));
+        }
+
+        [Test]
+        public void KlingonsMoveAndFire_MovesKlingon_SectorUpdated()
+        {
+            var mockRandom = new Mock<IRandom>();
+            Mock<QuadrantInfo> mockInfo = new(new Coordinates(0, 0), "Test-Quadrant", 1, 1, false);
+            mockInfo.Setup(i => i.KlingonCount).Returns(1);
+            mockInfo.Setup(i => i.HasStarbase).Returns(false);
+            mockInfo.Setup(i => i.StarCount).Returns(0);
+
+            var mockRandomGalaxy = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+            Mock<Galaxy> mockGalaxy = new(mockRandomGalaxy.Object);
+            mockGalaxy.Setup(g => g.KlingonCount).Returns(1);
+            mockGalaxy.Setup(g => g.StarbaseCount).Returns(1);
+            var randomMock = new Mock<IRandom>();
+            var ioMock = new Mock<IReadWrite>();
+            var enterpriseCoords = new Coordinates(2, 4);
+            Mock<Enterprise> mockEnterprise = new(1, enterpriseCoords, ioMock.Object, randomMock.Object);
+            mockEnterprise.Setup(e => e.TakeHit(It.IsAny<Coordinates>(), It.IsAny<int>())).Returns(CommandResult.GameOver);
+            randomMock.SetupSequence(r => r.NextFloat())
+                .Returns(0.3f)
+                .Returns(0f);
+            var klingonCoords = new Coordinates(2, 0);
+
+            var quadrant = new Quadrant(mockInfo.Object, mockEnterprise.Object, randomMock.Object, mockGalaxy.Object, ioMock.Object);
+            quadrant.KlingonsMoveAndFire();
+            Assert.That(quadrant.Klingons.First().Sector, !Is.EqualTo(klingonCoords));
         }
     }
 }
