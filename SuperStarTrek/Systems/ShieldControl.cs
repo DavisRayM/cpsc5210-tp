@@ -18,7 +18,7 @@ internal class ShieldControl : Subsystem
         _io = io;
     }
 
-    internal float ShieldEnergy { get; set; }
+    internal virtual float ShieldEnergy { get; set; }
 
     internal override bool CanExecuteCommand() => IsOperational("{name} inoperable");
 
