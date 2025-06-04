@@ -51,7 +51,7 @@ jobs:
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
         subject: "Team Project Test Results - branch=${{ github.ref_name }}"
-        to: dmuro@seattleu.edu
+        to: dmuro@seattleu.edu,ksullivan@seattleu.edu,tlo@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
         # Optional HTML body read from file:
@@ -67,7 +67,7 @@ jobs:
         username: ${{secrets.MAIL_USERNAME}}
         password: ${{secrets.MAIL_PASSWORD}}
         subject: "Team Project Coverage Results - branch=${{ github.ref_name }}"
-        to: dmuro@seattleu.edu
+        to: dmuro@seattleu.edu,ksullivan@seattleu.edu,tlo@seattleu.edu
         from: CPSC 5210 Team Project
         body: Build job of ${{github.repository}} completed successfully!
         # Optional HTML body read from file:
