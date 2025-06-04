@@ -163,6 +163,18 @@ namespace SuperStarTrek.Test.Systems
         }
 
         [Test]
+        public void Game_ShieldCommand_RequestShieldAmount()
+        {
+            writer.WriteLine("N");
+            writer.WriteLine("SHE");
+            writer.WriteLine("10");
+            RequestProcessShutdown();
+
+            string output = this.output.ToString();
+            Assert.True(output.Contains("Number of units to shields?"));
+        }
+
+        [Test]
         public void Game_DamageReport_ShowCasesDamageInfo()
         {
             writer.WriteLine("N");
