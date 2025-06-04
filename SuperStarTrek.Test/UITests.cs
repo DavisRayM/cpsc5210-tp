@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text;
 using SuperStarTrek.Resources;
+using System.Text.RegularExpressions;
 
 namespace SuperStarTrek.Test.Systems
 {
@@ -10,6 +11,7 @@ namespace SuperStarTrek.Test.Systems
         StringBuilder? output;
         StreamWriter? writer;
         StreamReader? reader;
+        int writeCount = 0;
 
         [SetUp]
         public void GameProcess()
@@ -28,12 +30,15 @@ namespace SuperStarTrek.Test.Systems
             };
 
             this.output = new StringBuilder();
+            this.writeCount = 0;
             this.process.OutputDataReceived += (sender, args) =>
             {
                 if (args.Data != null)
                 {
                     this.output.AppendLine(args.Data);
                     printOutput();
+                    writeToFile(TestContext.CurrentContext.Test.Name, this.writeCount);
+                    this.writeCount += 1;
                 }
             };
             this.process.ErrorDataReceived += (sender, args) =>
@@ -63,6 +68,20 @@ namespace SuperStarTrek.Test.Systems
             this.writer.WriteLine("Nay");
             this.writer.Close();
             this.process.WaitForExit();
+        }
+
+        public void writeToFile(String name, int uniqueID)
+        {
+            string fileName = $"test-{name}-{uniqueID}.txt";
+            File.WriteAllText(SanitizeFileName(fileName), this.output.ToString());
+        }
+
+        public static string SanitizeFileName(string name)
+        {
+            var invalidChars = Path.GetInvalidFileNameChars();
+            string safe = new string(name.Select(c => invalidChars.Contains(c) ? '_' : c).ToArray());
+            safe = Regex.Replace(safe, "_{2,}", "_");
+            return safe.Trim('_', ' ');
         }
 
         public void printOutput()
@@ -141,6 +160,18 @@ namespace SuperStarTrek.Test.Systems
 
             string output = this.output.ToString();
             Assert.True(output.Contains("Shields now at 10 units per your command."));
+        }
+
+        [Test]
+        public void Game_ShieldCommand_RequestShieldAmount()
+        {
+            writer.WriteLine("N");
+            writer.WriteLine("SHE");
+            writer.WriteLine("10");
+            RequestProcessShutdown();
+
+            string output = this.output.ToString();
+            Assert.True(output.Contains("Number of units to shields?"));
         }
 
         [Test]
