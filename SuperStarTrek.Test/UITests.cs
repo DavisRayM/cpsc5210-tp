@@ -4,7 +4,7 @@ using SuperStarTrek.Resources;
 
 namespace SuperStarTrek.Test.Systems
 {
-    public class GameTests
+    public class UITests
     {
         Process? process;
         StringBuilder? output;
@@ -33,6 +33,7 @@ namespace SuperStarTrek.Test.Systems
                 if (args.Data != null)
                 {
                     this.output.AppendLine(args.Data);
+                    printOutput();
                 }
             };
             this.process.ErrorDataReceived += (sender, args) =>
@@ -77,7 +78,6 @@ namespace SuperStarTrek.Test.Systems
             writer.WriteLine("N");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains("Do you need instructions (Y/N)?"));
         }
 
@@ -87,7 +87,6 @@ namespace SuperStarTrek.Test.Systems
             writer.WriteLine("Y");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains(Strings.Instructions));
         }
 
@@ -97,7 +96,6 @@ namespace SuperStarTrek.Test.Systems
             writer.WriteLine("N");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains(Strings.Title));
         }
 
@@ -115,7 +113,6 @@ namespace SuperStarTrek.Test.Systems
             writer.WriteLine("N");
             RequestProcessShutdown();
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -129,7 +126,6 @@ namespace SuperStarTrek.Test.Systems
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains("Course (1-9)? Warp Factor (0-8)?"));
         }
 
@@ -142,7 +138,6 @@ namespace SuperStarTrek.Test.Systems
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains("Shields now at 10 units per your command."));
         }
 
@@ -163,7 +158,6 @@ Photon Tubes              0
 Shield Control            0 
 Damage Control            0 
 Library-Computer          0";
-            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -176,7 +170,6 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains("Computer active and waiting command?"));
         }
 
@@ -196,7 +189,6 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -211,7 +203,6 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains(expected));
         }
 
@@ -232,7 +223,6 @@ Library-Computer          0";
             RequestProcessShutdown();
 
             string output = this.output.ToString();
-            printOutput();
             Assert.True(output.Contains(expected));
         }
     }
