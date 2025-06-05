@@ -7,15 +7,28 @@ namespace SuperStarTrek.Test
     public class IOSpy : IReadWrite
     {
         private StringBuilder _output = new();
+        private Queue<(float, float)> _read2NumbersInputs = new();
 
         public string GetOutput()
         {
             return _output.ToString();
         }
 
+        //public (float, float) Read2Numbers(string prompt)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public void EnqueueRead2Numbers((float, float) value)
+        {
+            _read2NumbersInputs.Enqueue(value);
+        }
+
         public (float, float) Read2Numbers(string prompt)
         {
-            throw new NotImplementedException();
+            return _read2NumbersInputs.Count > 0
+                ? _read2NumbersInputs.Dequeue()
+                : throw new InvalidOperationException("No input value provided for Read2Numbers.");
         }
 
         public (string, string) Read2Strings(string prompt)
