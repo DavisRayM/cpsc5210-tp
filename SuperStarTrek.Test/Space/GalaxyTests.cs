@@ -100,39 +100,39 @@ namespace SuperStarTrek.Test.Space
         #region Neighborhood Tests
 
         // Temporary commented out due to running indefinitely
-        //[Test, TestCaseSource(nameof(ValidCoordinates))]
-        //[Category("Neighborhood")]
-        //public void GetNeighborhood_ReturnsExpected3x3Grid(int x, int y)
-        //{
-        //    var coord = new Coordinates(x, y);
-        //    var info = QuadrantInfo.Create(coord, "Alpha I", new Mock<IRandom>().Object);
-        //    var (enterprise, ioMock, randomMock) = CreateEnterprise(coord);
+        [Test, TestCaseSource(nameof(ValidCoordinates))]
+        [Category("Neighborhood")]
+        public void GetNeighborhood_ReturnsExpected3x3Grid(int x, int y)
+        {
+            var coord = new Coordinates(x, y);
+            var info = QuadrantInfo.Create(coord, "Alpha I", new Mock<IRandom>().Object);
+            var (enterprise, ioMock, randomMock) = CreateEnterprise(coord);
 
-        //    var quadrant = new Quadrant(info, enterprise, randomMock.Object, _galaxy, ioMock.Object);
-        //    var neighbors = _galaxy.GetNeighborhood(quadrant).ToArray();
+            var quadrant = new Quadrant(info, enterprise, randomMock.Object, _galaxy, ioMock.Object);
+            var neighbors = _galaxy.GetNeighborhood(quadrant).ToArray();
 
-        //    Assert.That(neighbors.Length, Is.EqualTo(3), "Neighborhood should have 3 rows.");
-        //    foreach (var row in neighbors)
-        //    {
-        //        Assert.That(row.Count(), Is.EqualTo(3), "Each row should have 3 columns.");
-        //    }
-        //}
+            Assert.That(neighbors.Length, Is.EqualTo(3), "Neighborhood should have 3 rows.");
+            foreach (var row in neighbors)
+            {
+                Assert.That(row.Count(), Is.EqualTo(3), "Each row should have 3 columns.");
+            }
+        }
 
         // Temporary commented out due to running indefinitely
-        //[Test]
-        //[Category("Neighborhood")]
-        //public void GetNeighborhood_HandlesEdgesCorrectly()
-        //{
-        //    var coord = new Coordinates(0, 0);
-        //    var info = QuadrantInfo.Create(coord, "Alpha I", new Mock<IRandom>().Object);
-        //    var (enterprise, ioMock, randomMock) = CreateEnterprise(coord);
+        [Test]
+        [Category("Neighborhood")]
+        public void GetNeighborhood_HandlesEdgesCorrectly()
+        {
+            var coord = new Coordinates(0, 0);
+            var info = QuadrantInfo.Create(coord, "Alpha I", new Mock<IRandom>().Object);
+            var (enterprise, ioMock, randomMock) = CreateEnterprise(coord);
 
-        //    var quadrant = new Quadrant(info, enterprise, randomMock.Object, _galaxy, ioMock.Object);
-        //    var neighbors = _galaxy.GetNeighborhood(quadrant).ToArray();
+            var quadrant = new Quadrant(info, enterprise, randomMock.Object, _galaxy, ioMock.Object);
+            var neighbors = _galaxy.GetNeighborhood(quadrant).ToArray();
 
-        //    Assert.That(neighbors[0].ElementAt(0), Is.Null, "Out-of-bounds neighbor should be null.");
-        //    Assert.That(neighbors[2].ElementAt(2), Is.Not.Null, "Valid neighbor should not be null.");
-        //}
+            Assert.That(neighbors[0].ElementAt(0), Is.Null, "Out-of-bounds neighbor should be null.");
+            Assert.That(neighbors[2].ElementAt(2), Is.Not.Null, "Valid neighbor should not be null.");
+        }
 
 
         #endregion

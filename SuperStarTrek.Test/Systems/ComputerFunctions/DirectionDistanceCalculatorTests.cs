@@ -6,87 +6,79 @@ using SuperStarTrek.Space;
 using Games.Common.IO;
 using Games.Common.Randomness;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace SuperStarTrek.Test.Systems.ComputerFunctions
 {
     [TestFixture]
     public class DirectionDistanceCalculatorTests
     {
-        private Mock<IReadWrite> _mockIo;
-        private Mock<IRandom> _mockRandom;
-        private Galaxy _galaxy;
-        private Enterprise _enterprise;
-        private IQuadrant _quadrant;
+        private Mock<IReadWrite> _io;
+        private Mock<IRandom> _random;
+        private IOSpy _ioSpy;
+        private Mock<Galaxy> _galaxy;
+        private Mock<Enterprise> _enterprise;
+        private Mock<IQuadrant> _quadrant;
         private DirectionDistanceCalculator _calculator;
-
-        public void Setup(
-            int quadrantX, int quadrantY,
-            int sectorX, int sectorY
-            //(float, float) initialInput,
-            //(float, float) finalInput
-        )
+        private static IEnumerable<TestCaseData> ValidCoordinates => new[]
         {
-            // Setup Io and Random
-            _mockIo = new Mock<IReadWrite>();
-            _mockRandom = new Mock<IRandom>();
+            new TestCaseData((0, 0),(0, 5)),
+            new TestCaseData((4, 4),(3, 2)),
+            new TestCaseData((7, 7),(1, 5)),
+            new TestCaseData((0, 7),(2, 7)),
+            new TestCaseData((7, 0),(1, 1)),
+            new TestCaseData((3, 2),(1, 2))
+        };
 
-            _mockIo.SetupSequence(io => io.Read2Numbers(It.IsAny<string>()))
-                .Returns((1, 2))
-                .Returns((3, 4));
+        [SetUp]
+        public void Setup()
+        {
+            //_io = new Mock<IReadWrite>();
+            _random = new Mock<IRandom>();
 
-            _mockRandom.Setup(r => r.NextFloat()).Returns(0f);
-
-            // Setup Coordinates, Galaxy, Enterprise, and Quadrant
-            var quadrantCoords = new Coordinates(quadrantX, quadrantY);
-            var sectorCoords = new Coordinates(sectorX, sectorY);
-
-            _galaxy = new Galaxy(_mockRandom.Object);
-
-            _enterprise = new Enterprise(
-                1000, 
-                sectorCoords, 
-                _mockIo.Object, 
-                _mockRandom.Object
+            // Setup Galaxy, Enterprise, and Quadrant
+            _ioSpy = new();
+            _galaxy = new Mock<Galaxy>(_random.Object);
+            _quadrant = new Mock<IQuadrant>();
+            _enterprise = new Mock<Enterprise>(
+                1000,
+                new Coordinates(1, 1),
+                _ioSpy,
+                _random.Object
             );
-
-            var quadrantInfo = new QuadrantInfo(quadrantCoords, "Test Quadrant", 0, 0, false);
-            _quadrant = new Quadrant(
-                quadrantInfo, 
-                _enterprise, 
-                _mockRandom.Object, 
-                _galaxy, 
-                _mockIo.Object
-            );
-
-            typeof(Enterprise)
-                .GetField("_quadrant", BindingFlags.NonPublic | BindingFlags.Instance)
-                ?.SetValue(_enterprise, _quadrant);
-
-            // Setup test
-            _calculator = new DirectionDistanceCalculator(_enterprise, _mockIo.Object);
         }
 
-        [TestCase(1, 2, 3, 4)]
-        [TestCase(0, 0, 7, 7)]
-        [TestCase(5, 6, 1, 1)]
+        [Test, TestCaseSource(nameof(ValidCoordinates))]
         public void Execute_PrintsExpectedLocationAndPromptsForCoordinates(
-            int quadrantX, int quadrantY,
-            int sectorX, int sectorY
+            (int, int) qC, (int, int) sC
         )
         {
-            Setup(quadrantX, quadrantY, sectorX, sectorY);
-            var quadrantCoords = new Coordinates(quadrantX, quadrantY);
-            var sectorCoords = new Coordinates(sectorX, sectorY);
-            _mockIo.Invocations.ToList().ForEach(i => Console.WriteLine(i));
+            Coordinates quadrantCoords = new(qC.Item1, qC.Item2);
+            Coordinates sectorCoords = new(sC.Item1, sC.Item2);
 
-            _calculator.Execute(_quadrant);
+            _enterprise.Setup(q => q.QuadrantCoordinates).Returns(quadrantCoords);
+            _enterprise.Setup(q => q.SectorCoordinates).Returns(sectorCoords);
 
-            _mockIo.Verify(io => io.WriteLine("Direction/distance calculator:"), Times.Once);
-            _mockIo.Verify(io => io.Write($"You are at quadrant {quadrantCoords}"), Times.Once);
-            _mockIo.Verify(io => io.WriteLine($" sector {sectorCoords}"), Times.Once);
-            _mockIo.Verify(io => io.WriteLine("Please enter"), Times.Once);
-            _mockIo.Verify(io => io.Read2Numbers(It.IsAny<string>()), Times.Exactly(2)); 
+            _ioSpy.EnqueueRead2Numbers(qC);
+            _ioSpy.EnqueueRead2Numbers(sC);
+
+            // Act
+            _calculator = new DirectionDistanceCalculator(_enterprise.Object, _ioSpy);
+            _calculator.Execute(_quadrant.Object);
+
+            // Assert
+            var output = _ioSpy.GetOutput();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Does.Contain("Direction/distance calculator:"));
+                Assert.That(output, Does.Contain($"You are at quadrant {quadrantCoords}"));
+                Assert.That(output, Does.Contain($" sector {sectorCoords}"));
+                Assert.That(output, Does.Contain("Please enter"));
+                Assert.That(output, Does.Contain("Direction ="));
+                Assert.That(output, Does.Contain("Distance ="));
+            });
+
         }
     }
-
 }
