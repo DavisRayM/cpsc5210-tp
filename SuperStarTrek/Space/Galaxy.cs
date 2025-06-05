@@ -57,6 +57,7 @@ internal class Galaxy
         Enumerable.Range(-1, 3)
             .Select(dx => dx + quadrant.Coordinates.X)
             .Select(x => GetNeighborhoodRow(quadrant, x));
+
     private IEnumerable<QuadrantInfo> GetNeighborhoodRow(IQuadrant quadrant, int x) =>
         Enumerable.Range(-1, 3)
             .Select(dy => dy + quadrant.Coordinates.Y)

@@ -36,9 +36,12 @@ namespace SuperStarTrek.Test.Systems
                 if (args.Data != null)
                 {
                     this.output.AppendLine(args.Data);
-                    printOutput();
-                    writeToFile(TestContext.CurrentContext.Test.Name, this.writeCount);
-                    this.writeCount += 1;
+                    if (args.Data.Trim() != "")
+                    {
+                        printOutput();
+                        writeToFile(TestContext.CurrentContext.Test.Name, this.writeCount);
+                        this.writeCount += 1;
+                    }
                 }
             };
             this.process.ErrorDataReceived += (sender, args) =>
