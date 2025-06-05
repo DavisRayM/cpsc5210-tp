@@ -47,7 +47,7 @@ namespace SuperStarTrek.Systems
             return CommandResult.Ok;
         }
 
-        private bool TryGetWarpFactor(out float warpFactor)
+        internal bool TryGetWarpFactor(out float warpFactor)
         {
             var maximumWarp = IsDamaged ? 0.2f : 8;
             if (_io.TryReadNumberInRange("Warp Factor", 0, maximumWarp, out warpFactor))
@@ -63,7 +63,7 @@ namespace SuperStarTrek.Systems
             return false;
         }
 
-        private bool TryGetDistanceToMove(float warpFactor, out int distanceToTravel)
+        internal bool TryGetDistanceToMove(float warpFactor, out int distanceToTravel)
         {
             distanceToTravel = (int)Math.Round(warpFactor * 8, MidpointRounding.AwayFromZero);
             if (distanceToTravel <= _enterprise.Energy) { return true; }
