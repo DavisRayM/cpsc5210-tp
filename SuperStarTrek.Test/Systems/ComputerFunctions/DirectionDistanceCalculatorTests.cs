@@ -3,10 +3,13 @@ using Moq;
 using SuperStarTrek.Systems.ComputerFunctions;
 using SuperStarTrek.Objects;
 using SuperStarTrek.Space;
+using SuperStarTrek.Utils;
 using Games.Common.IO;
 using Games.Common.Randomness;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Diagnostics.Metrics;
+using System.Numerics;
 
 namespace SuperStarTrek.Test.Systems.ComputerFunctions
 {
@@ -55,6 +58,8 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         {
             Coordinates quadrantCoords = new(qC.Item1, qC.Item2);
             Coordinates sectorCoords = new(sC.Item1, sC.Item2);
+            Coordinates from = new(qC.Item1, qC.Item2);
+            Coordinates to = new(sC.Item1, sC.Item2);
 
             _enterprise.Setup(q => q.QuadrantCoordinates).Returns(quadrantCoords);
             _enterprise.Setup(q => q.SectorCoordinates).Returns(sectorCoords);
@@ -62,23 +67,25 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             _ioSpy.EnqueueRead2Numbers(qC);
             _ioSpy.EnqueueRead2Numbers(sC);
 
+            var (direction, distance) = DirectionAndDistance.From(from.X, from.Y).To(to.X, to.Y);
+
             // Act
             _calculator = new DirectionDistanceCalculator(_enterprise.Object, _ioSpy);
             _calculator.Execute(_quadrant.Object);
 
             // Assert
             var output = _ioSpy.GetOutput();
+            String[] expectedOutput = [
+                "Direction/distance calculator:",
+                $"You are at quadrant {quadrantCoords}",
+                $" sector {sectorCoords}",
+                "Please enter",
+                $"Direction = {direction}",
+                $"Distance = {distance}",
+                ""
+            ];
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(output, Does.Contain("Direction/distance calculator:"));
-                Assert.That(output, Does.Contain($"You are at quadrant {quadrantCoords}"));
-                Assert.That(output, Does.Contain($" sector {sectorCoords}"));
-                Assert.That(output, Does.Contain("Please enter"));
-                Assert.That(output, Does.Contain("Direction ="));
-                Assert.That(output, Does.Contain("Distance ="));
-            });
-
+            Assert.That(output, Is.EqualTo(string.Join(Environment.NewLine, expectedOutput)));
         }
     }
 }
