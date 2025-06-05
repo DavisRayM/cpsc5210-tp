@@ -83,54 +83,154 @@ namespace SuperStarTrek.Test.Space
 
         [Test]
         [Category("Properties")]
-        public void Galaxy_StarbaseCount_IsAtLeastOne()
+        public void Galaxy_StarbaseCount_IsExpectedNumber()
         {
-            Assert.That(_galaxy.StarbaseCount, Is.GreaterThanOrEqualTo(1), "Galaxy should have at least one starbase.");
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0.98f) // Adds 1 starbase in the first QuadrantInfo
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0.98f) // Adds 1 starbase in the first QuadrantInfo
+                .Returns(0f);
+            var galaxy = new Galaxy(mockRandom.Object);
+
+            Assert.That(galaxy.StarbaseCount, Is.EqualTo(2), "Galaxy should have at least one starbase.");
         }
 
         [Test]
         [Category("Properties")]
-        public void Galaxy_KlingonCount_IsPositive()
+        public void Galaxy_KlingonCount_IsExpectedNumber()
         {
-            Assert.That(_galaxy.KlingonCount, Is.GreaterThanOrEqualTo(1), "Galaxy should have Klingons present after starbase placement.");
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0.99f) // Creates 3 Klingons in the first QuadrantInfo
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0.98f) // Adds 2 Klingons in the second QuadrantInfo
+                .Returns(0f)
+                .Returns(0f);
+
+            var galaxy = new Galaxy(mockRandom.Object);
+
+            Assert.That(galaxy.KlingonCount, Is.EqualTo(5), "Galaxy should have Klingons present after starbase placement.");
+        }
+
+
+        [Test]
+        [Category("Properties")]
+        public void Galaxy_CreatesStarbase_IfNone()
+        {
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(0f)
+                .Returns(0f)
+                .Returns(0f);
+
+            var galaxy = new Galaxy(mockRandom.Object);
+
+            Assert.That(galaxy.StarbaseCount, Is.EqualTo(1), "Galaxy should have Klingons present after starbase placement.");
+        }
+
+
+        [Test]
+        [TestCase(0.96f, ExpectedResult = 2, Reason = "Has 2 Klingons none should be added")]
+        [TestCase(0.81f, ExpectedResult = 2, Reason = "Adds 1 Klingon Should have 2 total at the end")]
+        [TestCase(0f, ExpectedResult = 1, Reason = "Adds 0 Klingon Should have 1 total at the end")]
+        [Category("Properties")]
+        public int Galaxy_AddsKlingon_WhenLessThanTwo(float klingonRandom)
+        {
+            var mockRandom = new Mock<IRandom>();
+            mockRandom.SetupSequence(r => r.NextFloat())
+                .Returns(klingonRandom)
+                .Returns(0f);
+
+            var galaxy = new Galaxy(mockRandom.Object);
+
+            return galaxy.KlingonCount;
         }
 
         #endregion
 
         #region Neighborhood Tests
 
-        // Temporary commented out due to running indefinitely
         [Test, TestCaseSource(nameof(ValidCoordinates))]
         [Category("Neighborhood")]
-        public void GetNeighborhood_ReturnsExpected3x3Grid(int x, int y)
+        public void GetNeighborhood_ReturnsExpected3RowGrid(int x, int y)
         {
             var coord = new Coordinates(x, y);
-            var info = QuadrantInfo.Create(coord, "Alpha I", new Mock<IRandom>().Object);
-            var (enterprise, ioMock, randomMock) = CreateEnterprise(coord);
 
-            var quadrant = new Quadrant(info, enterprise, randomMock.Object, _galaxy, ioMock.Object);
-            var neighbors = _galaxy.GetNeighborhood(quadrant).ToArray();
+            Mock<IQuadrant> mockQuadrant = new();
+            mockQuadrant.Setup(q => q.Coordinates).Returns(coord);
+
+            var neighbors = _galaxy.GetNeighborhood(mockQuadrant.Object).ToArray();
 
             Assert.That(neighbors.Length, Is.EqualTo(3), "Neighborhood should have 3 rows.");
-            foreach (var row in neighbors)
-            {
-                Assert.That(row.Count(), Is.EqualTo(3), "Each row should have 3 columns.");
-            }
         }
 
-        // Temporary commented out due to running indefinitely
+        private QuadrantInfo? CheckBoundsNeighbor(List<List<QuadrantInfo>> quadrants, int x, int y)
+        {
+            return (x < 0 || x > 7 || y < 0 || y > 7) ? null : quadrants[x][y];
+        }
+
+        [Test, TestCaseSource(nameof(ValidCoordinates))]
+        [Category("Neighborhood")]
+        public void GetNeighborhood_ReturnsExpected3Rows(int x, int y)
+        {
+            var coord = new Coordinates(x, y);
+            var quadrants = _galaxy.Quadrants.Select(row => row.ToList()).ToList();
+
+            var expected = new List<List<QuadrantInfo?>>
+            {
+                new()
+                {
+                    CheckBoundsNeighbor(quadrants, coord.X - 1, coord.Y - 1),
+                    CheckBoundsNeighbor(quadrants, coord.X - 1, coord.Y),
+                    CheckBoundsNeighbor(quadrants, coord.X - 1, coord.Y + 1)
+                },
+                new()
+                {
+                    CheckBoundsNeighbor(quadrants, coord.X, coord.Y - 1),
+                    CheckBoundsNeighbor(quadrants, coord.X, coord.Y),
+                    CheckBoundsNeighbor(quadrants, coord.X, coord.Y + 1)
+                },
+                new()
+                {
+                    CheckBoundsNeighbor(quadrants, coord.X + 1, coord.Y - 1),
+                    CheckBoundsNeighbor(quadrants, coord.X + 1, coord.Y),
+                    CheckBoundsNeighbor(quadrants, coord.X + 1, coord.Y + 1)
+                }
+            };
+
+            Mock<IQuadrant> mockQuadrant = new();
+            mockQuadrant.Setup(q => q.Coordinates).Returns(coord);
+
+            var neighbors = _galaxy.GetNeighborhood(mockQuadrant.Object).ToArray();
+
+            Assert.That(neighbors, Is.EqualTo(expected), "Neighborhood should have 3 rows.");
+        }
+
         [Test]
         [Category("Neighborhood")]
-        public void GetNeighborhood_HandlesEdgesCorrectly()
+        public void GetNeighborhood_OutOfBounds_IsNull()
         {
             var coord = new Coordinates(0, 0);
-            var info = QuadrantInfo.Create(coord, "Alpha I", new Mock<IRandom>().Object);
-            var (enterprise, ioMock, randomMock) = CreateEnterprise(coord);
-
-            var quadrant = new Quadrant(info, enterprise, randomMock.Object, _galaxy, ioMock.Object);
-            var neighbors = _galaxy.GetNeighborhood(quadrant).ToArray();
+            Mock<IQuadrant> mockQuadrant = new();
+            mockQuadrant.Setup(q => q.Coordinates).Returns(coord);
+            var neighbors = _galaxy.GetNeighborhood(mockQuadrant.Object).ToArray();
 
             Assert.That(neighbors[0].ElementAt(0), Is.Null, "Out-of-bounds neighbor should be null.");
+        }
+
+        [Test]
+        [Category("Neighborhood")]
+        public void GetNeighborhood_Neighbor_IsNotNull()
+        {
+            var coord = new Coordinates(0, 0);
+            Mock<IQuadrant> mockQuadrant = new();
+            mockQuadrant.Setup(q => q.Coordinates).Returns(coord);
+            var neighbors = _galaxy.GetNeighborhood(mockQuadrant.Object).ToArray();
+
             Assert.That(neighbors[2].ElementAt(2), Is.Not.Null, "Valid neighbor should not be null.");
         }
 

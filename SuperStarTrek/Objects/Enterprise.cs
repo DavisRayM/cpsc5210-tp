@@ -36,7 +36,7 @@ internal class Enterprise
 
     internal virtual Coordinates SectorCoordinates { get; private set; }
 
-    internal string Condition => GetCondition();
+    internal virtual string Condition => GetCondition();
 
     internal virtual LibraryComputer Computer => (LibraryComputer)_commandExecutors[Command.COM];
 
@@ -50,7 +50,7 @@ internal class Enterprise
 
     internal IEnumerable<Subsystem> Systems => _systems;
 
-    internal PhotonTubes PhotonTubes => (PhotonTubes)_commandExecutors[Command.TOR];
+    internal virtual PhotonTubes PhotonTubes => (PhotonTubes)_commandExecutors[Command.TOR];
 
     internal virtual bool IsDocked => _quadrant.EnterpriseIsNextToStarbase;
 
