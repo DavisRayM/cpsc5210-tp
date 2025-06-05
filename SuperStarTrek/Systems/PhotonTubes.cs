@@ -60,5 +60,5 @@ internal class PhotonTubes : Subsystem
         return quadrant.KlingonsFireOnEnterprise();
     }
 
-    internal void ReplenishTorpedoes() => TorpedoCount = _tubeCount;
+    internal virtual void ReplenishTorpedoes() => TorpedoCount = _tubeCount;
 }

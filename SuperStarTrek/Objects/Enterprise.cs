@@ -86,7 +86,7 @@ internal class Enterprise
         return _commandExecutors[command].ExecuteCommand(_quadrant);
     }
 
-    internal void Refuel() => TotalEnergy = _maxEnergy;
+    internal virtual void Refuel() => TotalEnergy = _maxEnergy;
 
     public override string ToString() => "<*>";
 
@@ -129,7 +129,7 @@ internal class Enterprise
         _io.WriteLine($"Damage Control reports, '{system.Name} damaged by the hit.'");
     }
 
-    internal void RepairSystems(float repairWorkDone)
+    internal virtual void RepairSystems(float repairWorkDone)
     {
         var repairedSystems = new List<string>();
 
@@ -151,7 +151,7 @@ internal class Enterprise
         }
     }
 
-    internal void VaryConditionOfRandomSystem()
+    internal virtual void VaryConditionOfRandomSystem()
     {
         if (_random.NextFloat() > 0.2f) { return; }
 
