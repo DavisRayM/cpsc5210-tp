@@ -76,7 +76,7 @@ internal class Quadrant : IQuadrant
         }
     }
 
-    internal void Display(string textFormat)
+    public void Display(string textFormat)
     {
         if (!_entered)
         {

@@ -53,5 +53,5 @@ internal class ShieldControl : Subsystem
 
     internal void AbsorbHit(int hitStrength) => ShieldEnergy -= hitStrength;
 
-    internal void DropShields() => ShieldEnergy = 0;
+    internal virtual void DropShields() => ShieldEnergy = 0;
 }
