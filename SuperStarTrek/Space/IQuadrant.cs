@@ -13,6 +13,7 @@ namespace SuperStarTrek.Space
         Starbase Starbase { get; }
         IEnumerable<Klingon> Klingons { get; }
 
+        void Display(string textFormat);
         bool TorpedoCollisionAt(Coordinates coordinates, out string message, out bool gameOver);
         string Remove(Klingon klingon);
         CommandResult KlingonsMoveAndFire();

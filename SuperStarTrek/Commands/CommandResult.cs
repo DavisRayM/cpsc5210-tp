@@ -5,7 +5,7 @@ internal class CommandResult
     public static readonly CommandResult Ok = new(false);
     public static readonly CommandResult GameOver = new(true);
 
-    private CommandResult(bool isGameOver)
+    internal CommandResult(bool isGameOver)
     {
         IsGameOver = isGameOver;
     }

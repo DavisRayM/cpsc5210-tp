@@ -30,7 +30,7 @@ internal class Enterprise
         _random = random;
     }
 
-    internal Quadrant Quadrant => _quadrant;
+    internal virtual IQuadrant Quadrant => _quadrant;
 
     internal virtual Coordinates QuadrantCoordinates => _quadrant.Coordinates;
 
@@ -44,7 +44,7 @@ internal class Enterprise
 
     internal virtual float Energy => TotalEnergy - ShieldControl.ShieldEnergy;
 
-    internal float TotalEnergy { get; private set; }
+    internal float TotalEnergy { get; set; }
 
     internal virtual int DamagedSystemCount => _systems.Count(s => s.IsDamaged);
 
@@ -169,7 +169,7 @@ internal class Enterprise
         }
     }
 
-    internal float Move(Course course, float warpFactor, int distance)
+    internal virtual float Move(Course course, float warpFactor, int distance)
     {
         var (quadrant, sector) = MoveWithinQuadrant(course, distance) ?? MoveBeyondQuadrant(course, distance);
 
