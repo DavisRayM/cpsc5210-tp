@@ -66,7 +66,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             });
 
             // Setup Enterprise
-            _enterprise.Setup(e => e.SectorCoordinates).Returns(enterpriseSector);
+            _enterprise.Object.SectorCoordinates = enterpriseSector;
 
             // Need to get direction and distance from enterprise to klington
             var (direction, distance) = DirectionAndDistance

@@ -62,7 +62,8 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             Coordinates to = new(sC.Item1, sC.Item2);
 
             _enterprise.Setup(q => q.QuadrantCoordinates).Returns(quadrantCoords);
-            _enterprise.Setup(q => q.SectorCoordinates).Returns(sectorCoords);
+            //_enterprise.Setup(q => q.SectorCoordinates).Returns(sectorCoords);
+            _enterprise.Object.SectorCoordinates = sectorCoords;
 
             _ioSpy.EnqueueRead2Numbers(qC);
             _ioSpy.EnqueueRead2Numbers(sC);

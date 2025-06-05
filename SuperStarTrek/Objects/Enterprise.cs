@@ -34,7 +34,7 @@ internal class Enterprise
 
     internal virtual Coordinates QuadrantCoordinates => _quadrant.Coordinates;
 
-    internal virtual Coordinates SectorCoordinates { get; private set; }
+    internal Coordinates SectorCoordinates { get; set; }
 
     internal virtual string Condition => GetCondition();
 
