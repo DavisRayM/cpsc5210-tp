@@ -41,8 +41,8 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         [Test]
         public void WriteDirectionAndDistance_WithCoordinates_PrintsExpectedValues()
         {
-            var from = new Coordinates(1, 1); // prints as 2 , 2
-            var to = new Coordinates(4, 3);   // prints as 5 , 4
+            var from = new Coordinates(1, 1); 
+            var to = new Coordinates(4, 3);   
 
             var (direction, distance) = from.GetDirectionAndDistanceTo(to);
 

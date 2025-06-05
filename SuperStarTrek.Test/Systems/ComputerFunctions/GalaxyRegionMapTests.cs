@@ -23,7 +23,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
     public class GalaxyRegionMapTests
     {
         private Mock<IReadWrite> _mockIo;
-        private Galaxy _galaxy;
+        private Mock<Galaxy> _galaxy;
         private TestableGalaxyRegionMap _regionMap;
 
         [SetUp]
@@ -31,8 +31,8 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         {
             _mockIo = new Mock<IReadWrite>();
             var mockRandom = new Mock<IRandom>();
-            _galaxy = new Galaxy(mockRandom.Object);
-            _regionMap = new TestableGalaxyRegionMap(_mockIo.Object, _galaxy);
+            _galaxy = new Mock<Galaxy>(mockRandom.Object);
+            _regionMap = new TestableGalaxyRegionMap(_mockIo.Object, _galaxy.Object);
         }
 
         [Test]
