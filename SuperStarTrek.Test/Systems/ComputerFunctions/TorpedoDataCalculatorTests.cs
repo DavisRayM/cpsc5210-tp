@@ -7,6 +7,7 @@ using SuperStarTrek.Systems.ComputerFunctions;
 using Games.Common.IO;
 using Games.Common.Randomness;
 using SuperStarTrek.Resources;
+using SuperStarTrek.Utils;
 
 namespace SuperStarTrek.Test.Systems.ComputerFunctions
 {
@@ -15,24 +16,23 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
     {
         private IOSpy _ioSpy;
         private Mock<IRandom> _mockRandom;
-        private Enterprise _enterprise;
+        private Mock<Enterprise> _enterprise;
         private TorpedoDataCalculator _calculator;
 
         [SetUp]
         public void Setup()
         {
+            // Mock IO and Random
             _ioSpy = new IOSpy();
             _mockRandom = new Mock<IRandom>();
 
-            var sectorCoords = new Coordinates(3, 3);
-            _enterprise = new Enterprise(
+            // Mock Enterprise
+            _enterprise = new Mock<Enterprise>(
                 1000, 
-                sectorCoords, 
+                new Coordinates(0, 0), 
                 _ioSpy,
                 _mockRandom.Object
             );
-
-            _calculator = new TorpedoDataCalculator(_enterprise, _ioSpy);
         }
 
         [Test]
@@ -41,6 +41,7 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
             var mockQuadrant = new Mock<IQuadrant>();
             mockQuadrant.Setup(q => q.HasKlingons).Returns(false);
 
+            _calculator = new TorpedoDataCalculator(_enterprise.Object, _ioSpy);
             _calculator.Execute(mockQuadrant.Object);
 
             string output = _ioSpy.GetOutput();
@@ -50,26 +51,44 @@ namespace SuperStarTrek.Test.Systems.ComputerFunctions
         [Test]
         public void Execute_WithKlingons_PrintsDirectionAndDistanceForEach()
         {
-            var klingon1Sector = new Coordinates(5, 5);
-            var klingon2Sector = new Coordinates(5, 1);
+            var enterpriseSector = new Coordinates(5, 7);
+            var klingonSector = new Coordinates(5, 5);
 
-            var mockKlingon1 = new Mock<Klingon>(MockBehavior.Loose, klingon1Sector, _mockRandom.Object);
-            var mockKlingon2 = new Mock<Klingon>(MockBehavior.Loose, klingon2Sector, _mockRandom.Object);
+            // Mock Klingons
+            var mockKlingon = new Mock<Klingon>(MockBehavior.Loose, klingonSector, _mockRandom.Object);
 
+            // Mock Quadrant
             var mockQuadrant = new Mock<IQuadrant>();
             mockQuadrant.Setup(q => q.HasKlingons).Returns(true);
             mockQuadrant.Setup(q => q.KlingonCount).Returns(2);
             mockQuadrant.Setup(q => q.Klingons).Returns(new[] {
-                mockKlingon1.Object,
-                mockKlingon2.Object
+                mockKlingon.Object
             });
 
+            // Setup Enterprise
+            _enterprise.Setup(e => e.SectorCoordinates).Returns(enterpriseSector);
+
+            // Need to get direction and distance from enterprise to klington
+            var (direction, distance) = DirectionAndDistance
+                .From(_enterprise.Object.SectorCoordinates.X, _enterprise.Object.SectorCoordinates.Y)
+                .To(mockKlingon.Object.Sector.X, mockKlingon.Object.Sector.Y);
+
+            // Instantiate calculator
+            _calculator = new TorpedoDataCalculator(_enterprise.Object, _ioSpy);
+
+            // Act
             _calculator.Execute(mockQuadrant.Object);
 
             string output = _ioSpy.GetOutput();
-            string[] lines = output.Trim().Split('\n');
+            string[] expectedOutput = new[]
+            {
+                "From Enterprise to Klingon battle cruisers",
+                $"Direction = {direction}",
+                $"Distance = {distance}", 
+                ""
+            };
 
-            Assert.That(lines.Length, Is.EqualTo(5));
+            Assert.That(output, Is.EqualTo(string.Join(Environment.NewLine, expectedOutput)));
         }
     }
 }
